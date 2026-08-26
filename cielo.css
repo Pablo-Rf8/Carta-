@@ -1,0 +1,586 @@
+:root {
+  --rose: #ff9ebb;
+  --gold: #f4d06f;
+  --glass-border: rgba(255, 255, 255, 0.18);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background: #0b0714; /* respaldo mientras carga la escena */
+  color: #fff;
+  font-family: 'Montserrat', sans-serif;
+  overflow: hidden;
+  position: relative;
+}
+
+.page-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #0b0714;
+  opacity: 1;
+  pointer-events: none;
+  transition: opacity 0.9s ease;
+}
+
+body.page-ready .page-transition {
+  opacity: 0;
+}
+
+/* =========================================================
+   ESCENARIO CINEMÁTICO (todas las capas viven aquí, controladas por GSAP)
+   ========================================================= */
+.scene {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.sky {
+  position: absolute;
+  inset: 0;
+  will-change: background;
+}
+
+/* ESTRELLAS: puntos generados por JS, titileo en loop constante */
+.stars {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: #ffffff;
+  animation: twinkle var(--dur, 3s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.shooting-stars {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.shooting-star {
+  position: absolute;
+  width: 110px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, #ffffff 35%, #f4d06f);
+  box-shadow: 0 0 8px 1px rgba(255, 255, 255, 0.8);
+  transform: translate(-140px, -140px) rotate(35deg);
+  transform-origin: left center;
+  animation: shooting-star var(--dur, 3s) linear infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes shooting-star {
+  0% {
+    opacity: 0;
+    transform: translate(-140px, -140px) rotate(35deg);
+  }
+  15% {
+    opacity: 1;
+  }
+  45%, 100% {
+    opacity: 0;
+    transform: translate(320px, 320px) rotate(35deg);
+  }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: var(--min-alpha, 0.25); transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+/* LUNA */
+.moon {
+  position: absolute;
+  top: 18%;
+  left: 64%;
+  width: min(14vw, 90px);
+  height: min(14vw, 90px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 32%, #ffffff, #dbe4ff 55%, #a9b6e6 100%);
+  box-shadow: 0 0 40px 14px rgba(210, 220, 255, 0.45), 0 0 90px 40px rgba(180, 195, 255, 0.2);
+  opacity: 0;
+}
+
+/* SOL GIGANTE: degradado cálido vibrante */
+.sun {
+  position: absolute;
+  left: 50%;
+  top: 55%;
+  width: min(46vw, 340px);
+  height: min(46vw, 340px);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(#fff, #ffcf40, #ff5e36);
+  box-shadow: 0 0 60px 15px rgba(255, 190, 90, 0.55);
+}
+
+/* HALO de resplandor expansivo, capas de box-shadow */
+.sun-halo {
+  position: absolute;
+  left: 50%;
+  top: 55%;
+  width: min(46vw, 340px);
+  height: min(46vw, 340px);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow:
+    0 0 70px 30px rgba(255, 207, 64, 0.55),
+    0 0 160px 70px rgba(255, 142, 64, 0.35),
+    0 0 280px 130px rgba(255, 94, 54, 0.22),
+    0 0 440px 200px rgba(255, 60, 40, 0.12);
+}
+
+/* GLOW atmosférico, degradado radial de luz */
+.sun-glow {
+  position: absolute;
+  left: 50%;
+  top: 55%;
+  width: min(90vw, 760px);
+  height: min(90vw, 760px);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(255, 100, 20, 0.4), rgba(255, 100, 20, 0) 70%);
+}
+
+/* PÁJAROS: silueta CSS con aleteo constante en loop */
+.flock {
+  position: absolute;
+  top: 24%;
+  left: 0;
+  width: 100%;
+  height: 120px;
+}
+
+.bird {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 26px;
+  height: 26px;
+  opacity: 0;
+}
+
+.bird::before,
+.bird::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 13px;
+  height: 13px;
+  background: #241428;
+  border-radius: 100% 0 0 0;
+}
+
+.bird::before {
+  left: 0;
+  transform-origin: 100% 100%;
+  animation: flap-left 0.55s ease-in-out infinite alternate;
+}
+
+.bird::after {
+  left: 13px;
+  transform-origin: 0 100%;
+  animation: flap-right 0.55s ease-in-out infinite alternate;
+}
+
+.bird--1 { transform: scale(1.1); }
+.bird--2 { transform: scale(0.85); }
+.bird--2::before, .bird--2::after { animation-delay: 0.08s; }
+.bird--3 { transform: scale(1.3); }
+.bird--3::before, .bird--3::after { animation-delay: 0.16s; }
+.bird--4 { transform: scale(0.7); }
+.bird--4::before, .bird--4::after { animation-delay: 0.24s; }
+.bird--5 { transform: scale(1); }
+.bird--5::before, .bird--5::after { animation-delay: 0.32s; }
+
+@keyframes flap-left {
+  from { transform: rotate(10deg); }
+  to { transform: rotate(-45deg); }
+}
+
+@keyframes flap-right {
+  from { transform: rotate(-10deg); }
+  to { transform: rotate(45deg); }
+}
+
+/* CAPAS DE MONTAÑA / HORIZONTE, para profundidad */
+.mountain {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  will-change: background-color;
+}
+
+.mountain--back {
+  height: 34vh;
+  opacity: 0.85;
+  clip-path: polygon(0 100%, 0 55%, 8% 40%, 18% 58%, 27% 30%, 38% 60%, 50% 25%, 61% 55%, 72% 32%, 83% 58%, 92% 38%, 100% 52%, 100% 100%);
+}
+
+.mountain--mid {
+  height: 26vh;
+  clip-path: polygon(0 100%, 0 65%, 12% 45%, 24% 68%, 35% 42%, 47% 70%, 60% 40%, 73% 66%, 85% 46%, 100% 64%, 100% 100%);
+}
+
+.mountain--front {
+  height: 22vh;
+  clip-path: polygon(0 100%, 0 70%, 15% 50%, 30% 72%, 45% 48%, 58% 74%, 72% 52%, 86% 72%, 100% 58%, 100% 100%);
+}
+
+/* =========================================================
+   CONTENIDO: scroll snap fullscreen + tarjetas glassmorphism
+   ========================================================= */
+.snap-scroll-wrapper {
+  position: relative;
+  z-index: 5;
+  height: 100vh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.snap-scroll-wrapper::-webkit-scrollbar {
+  display: none;
+}
+.snap-scroll-wrapper {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.sky-section {
+  height: 100vh;
+  width: 100vw;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+.glass-card {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid var(--glass-border);
+  border-radius: 26px;
+  padding: 30px 24px;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  position: relative;
+}
+
+.sky-icon {
+  font-size: clamp(2.2rem, 7vw, 2.8rem);
+  margin-bottom: 6px;
+}
+
+.sky-tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+
+.sky-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.6rem, 5.5vw, 2rem);
+  font-style: italic;
+  color: var(--rose);
+  margin-bottom: 4px;
+}
+
+.divider {
+  color: var(--gold);
+  font-size: 0.7rem;
+  letter-spacing: 6px;
+  margin-bottom: 14px;
+}
+
+.sky-text {
+  font-family: 'Caveat', cursive;
+  font-size: clamp(1.15rem, 4.2vw, 1.35rem);
+  line-height: 1.55;
+  color: #fcecef;
+  margin-bottom: 10px;
+}
+
+.typewriter-text {
+  display: inline;
+}
+
+.reveal-after-text {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.9s ease, transform 0.9s ease;
+}
+
+.reveal-after-text.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.scroll-hint {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.scroll-arrow {
+  font-size: 1.1rem;
+  animation: bounceArrow 1.6s infinite;
+}
+
+@keyframes bounceArrow {
+  0%, 100% { transform: translateY(0); opacity: 0.5; }
+  50% { transform: translateY(6px); opacity: 1; }
+}
+
+.timer-box {
+  margin-top: 14px;
+  padding: 16px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.timer-title {
+  font-size: 0.85rem;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+
+.counter-display {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 8px;
+}
+
+.time-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.num {
+  font-size: clamp(1.3rem, 4.8vw, 1.6rem);
+  font-weight: 600;
+  color: var(--rose);
+  font-variant-numeric: tabular-nums;
+}
+
+.lbl {
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.65);
+  text-transform: uppercase;
+}
+
+.timer-sub {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+}
+
+.sky-signature {
+  margin-top: 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.sky-signature .tag {
+  font-family: 'Caveat', cursive;
+  font-size: 1.1rem;
+  color: var(--gold);
+}
+
+.sky-signature .author {
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.9rem;
+  color: var(--rose);
+}
+
+.back-top-btn {
+  margin-top: 16px;
+  font-size: 0.8rem;
+  color: var(--gold);
+  background: none;
+  border: none;
+  font-family: 'Montserrat', sans-serif;
+  cursor: pointer;
+  opacity: 0.75;
+  transition: opacity 0.2s ease;
+}
+
+.back-top-btn:active {
+  opacity: 1;
+}
+
+.back-top-btn:focus-visible,
+.side-dot:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+.side-nav {
+  position: fixed;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  z-index: 50;
+}
+
+.side-dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.side-dot span {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  color: #fff;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  white-space: nowrap;
+}
+
+.side-dot.active {
+  background: var(--rose);
+  transform: scale(1.6);
+}
+
+.side-dot.active span {
+  opacity: 0.9;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-arrow,
+  .star,
+  .bird::before,
+  .bird::after {
+    animation: none;
+  }
+  .snap-scroll-wrapper {
+    scroll-behavior: auto;
+  }
+}
+
+@media (max-width: 360px) {
+  .glass-card {
+    padding: 24px 18px;
+  }
+  .counter-display {
+    gap: 4px;
+  }
+/* =========================================================
+   ESTRELLAS FUGACES (Se activan en la Noche)
+   ========================================================= */
+.shooting-stars {
+  position: absolute;
+  top: -20%;
+  left: -20%;
+  width: 140vw;
+  height: 140vh;
+  transform: rotateZ(45deg);
+  pointer-events: none;
+  opacity: 0; /* Controlado por GSAP al hacer scroll */
+  z-index: 1;
+}
+
+.shooting-star {
+  position: absolute;
+  height: 2px;
+  background: linear-gradient(-45deg, #ffffff, rgba(160, 200, 255, 0.8), rgba(0, 0, 255, 0));
+  border-radius: 999px;
+  filter: drop-shadow(0 0 8px rgba(180, 220, 255, 1));
+  animation: 
+    tail var(--dur, 3s) ease-in-out infinite,
+    shooting var(--dur, 3s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+/* Destello en la punta de la estrella */
+.shooting-star::before,
+.shooting-star::after {
+  content: '';
+  position: absolute;
+  top: calc(50% - 1px);
+  right: 0;
+  height: 2px;
+  background: linear-gradient(-45deg, rgba(0, 0, 255, 0), #ffffff, rgba(0, 0, 255, 0));
+  transform: translateX(50%) rotateZ(45deg);
+  border-radius: 100%;
+  animation: shining var(--dur, 3s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.shooting-star::after {
+  transform: translateX(50%) rotateZ(-45deg);
+}
+
+@keyframes shooting {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(380px); }
+}
+
+@keyframes tail {
+  0% { width: 0; }
+  30% { width: 120px; }
+  100% { width: 0; }
+}
+
+@keyframes shining {
+  0% { width: 0; }
+  50% { width: 28px; }
+  100% { width: 0; }
+}
+
+}

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Tú en Mi Cielo</title>
+
+  <!-- Tipografías de Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Dancing+Script:wght@600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="cielo.css" />
+</head>
+<body>
+
+  <div class="page-transition" aria-hidden="true"></div>
+
+  <!-- Música de fondo continua -->
+  <audio id="bg-music" loop preload="auto">
+    <source src="cancion.mp3" type="audio/mp3">
+  </audio>
+
+  <!-- ESCENARIO CINEMÁTICO: cielo, sol gigante, pájaros, montañas y estrellas -->
+<div class="scene" aria-hidden="true">
+    <div class="sky" id="sky"></div>
+
+    <div class="stars" id="stars"></div>
+    <!-- NUEVO: Contenedor para estrellas fugaces -->
+    <div class="shooting-stars" id="shootingStars"></div>
+
+    <div class="moon" id="moon"></div>
+
+    <div class="sun-glow" id="sunGlow"></div>
+    <div class="sun-halo" id="sunHalo"></div>
+    <div class="sun" id="sun"></div>
+
+    <div class="flock" id="flock">
+      <span class="bird bird--1"></span>
+      <span class="bird bird--2"></span>
+      <span class="bird bird--3"></span>
+      <span class="bird bird--4"></span>
+      <span class="bird bird--5"></span>
+    </div>
+
+    <div class="mountain mountain--back" id="mountainBack"></div>
+    <div class="mountain mountain--mid" id="mountainMid"></div>
+    <div class="mountain mountain--front" id="mountainFront"></div>
+  </div>
+
+  <!-- Indicador lateral de navegación -->
+  <nav class="side-nav" aria-label="Navegación entre secciones">
+    <button type="button" class="side-dot active" data-target="section-dawn" aria-label="Ir a Amanecer"><span>Amanecer</span></button>
+    <button type="button" class="side-dot" data-target="section-sunset" aria-label="Ir a Atardecer"><span>Atardecer</span></button>
+    <button type="button" class="side-dot" data-target="section-night" aria-label="Ir a Noche"><span>Noche</span></button>
+  </nav>
+
+  <!-- CONTENEDOR DE SCROLL VERTICAL FULLSCREEN -->
+  <main class="snap-scroll-wrapper" id="scrollWrapper">
+
+    <!-- SECCIÓN 1: AMANECER -->
+    <section class="sky-section" id="section-dawn" data-theme="dawn">
+      <div class="glass-card">
+        <span class="sky-tag">Amanecer</span>
+        <h2 class="sky-title">En mi Amanecer</h2>
+        <div class="divider">✦ ✦ ✦</div>
+        <p class="sky-text">
+          <span class="typewriter-text">Eres la primera luz que se asoma en mis mañanas, esa claridad suave que me recuerda que vale la pena abrir los ojos.</span>
+        </p>
+        <p class="sky-text">
+          <span class="typewriter-text">Cada día que empieza contigo en mis pensamientos se siente como un cielo recién estrenado, lleno de ilusión y de ganas de caminarlo a tu lado.</span>
+        </p>
+        <div class="scroll-hint">
+          <span>Desliza para continuar</span>
+          <div class="scroll-arrow">↓</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 2: ATARDECER -->
+    <section class="sky-section" id="section-sunset" data-theme="sunset">
+      <div class="glass-card">
+        <span class="sky-tag">Atardecer</span>
+        <h2 class="sky-title">En mi Atardecer</h2>
+        <div class="divider">✦ ✦ ✦</div>
+        <p class="sky-text">
+          <span class="typewriter-text">Eres el refugio cálido donde aterrizo cuando el día pesa, ese color dorado que le baja el ritmo a todo.</span>
+        </p>
+        <p class="sky-text">
+          <span class="typewriter-text">En medio del ruido, pensarte es encontrar ese instante exacto en que el sol se despide sin prisa: todo se calma, todo tiene sentido otra vez.</span>
+        </p>
+        <div class="scroll-hint">
+          <span>Sigue bajando</span>
+          <div class="scroll-arrow">↓</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 3: NOCHE Y CONTADOR -->
+    <section class="sky-section" id="section-night" data-theme="night">
+      <div class="glass-card">
+        <span class="sky-tag">Noche</span>
+        <h2 class="sky-title">En mi Noche</h2>
+        <div class="divider">✦ ✦ ✦</div>
+        <p class="sky-text">
+          <span class="typewriter-text">Eres la luna que se queda quieta sobre mis silencios y el último pensamiento antes de cerrar los ojos, siempre el más bonito del día.</span>
+        </p>
+
+        <!-- Contador en vivo -->
+        <div class="timer-box reveal-after-text reveal-timer">
+          <p class="timer-title">El tiempo que te llevo amando:</p>
+          <div class="counter-display">
+            <div class="time-col">
+              <span class="num" id="days">00</span>
+              <span class="lbl">Días</span>
+            </div>
+            <div class="time-col">
+              <span class="num" id="hours">00</span>
+              <span class="lbl">Horas</span>
+            </div>
+            <div class="time-col">
+              <span class="num" id="minutes">00</span>
+              <span class="lbl">Minutos</span>
+            </div>
+            <div class="time-col">
+              <span class="num" id="seconds">00</span>
+              <span class="lbl">Segundos</span>
+            </div>
+          </div>
+          <p class="timer-sub">...y este número seguirá sumando a tu lado.</p>
+        </div>
+
+        <footer class="sky-signature reveal-after-text reveal-signature">
+          <span class="tag">Siempre tuyo,</span>
+          <span class="author">Tu bb ♡</span>
+        </footer>
+
+        <button type="button" class="back-top-btn" id="backTopBtn">
+          ↑ Volver al amanecer
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- GSAP + ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="cielo.js"></script>
+</body>
+</html>

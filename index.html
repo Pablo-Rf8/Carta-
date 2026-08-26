@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Para Mi Cielo ❤️</title>
+
+  <!-- Tipografías -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Dancing+Script:wght@600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Transición suave entre páginas -->
+  <div class="page-transition" aria-hidden="true"></div>
+
+  <!-- Música de fondo -->
+  <audio id="bg-music" loop preload="auto">
+    <source src="cancion.mp3" type="audio/mp3">
+  </audio>
+
+  <!-- Ramo en forma de corazón (Oculto al inicio) -->
+  <div id="bloom-stage">
+    <div id="bloom-container"></div>
+  </div>
+  
+  <!-- Pétalos cayendo en el fondo -->
+  <canvas id="petals-canvas"></canvas>
+
+  <!-- CONTENIDO PRINCIPAL: EL SOBRE -->
+  <main class="main-content" id="mainContent">
+      <h1 class="hero-title">Para Mi Cielo</h1>
+      
+      <div class="contenedor">
+          <div class="envoltura-sobre" id="sobreInteractuable">
+              
+              <!-- Piezas del sobre -->
+              <div class="sobre"></div>
+              <div class="solapa solapa-superior"></div>
+              <div class="solapa solapa-derecha"></div>
+              <div class="solapa solapa-izquierda"></div>
+              
+              <!-- Sello -->
+              <div class="sello-css" id="selloCss">♥</div>
+
+              <!-- LA CARTA QUE SALE DEL SOBRE -->
+              <div class="carta glass-card" id="cartaInterior">
+                  <header class="letter-header">
+                    <span class="letter-date">29 de Agosto, 2026</span>
+                    <h2 class="letter-title">Feliz Primer Mes, Mi Amor</h2>
+                    <div class="divider">✦ ✦ ✦</div>
+                  </header>
+
+                  <div class="letter-body"><span id="typed-text"></span><span class="cursor" id="cursor"></span></div>
+
+                  <div class="next-journey" id="nextJourney">
+                    <a href="cielo.html" class="journey-btn" id="journeyBtn">
+                      por qué eres mi cielo?
+                    </a>
+                  </div>
+              </div>
+
+          </div>
+      </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
