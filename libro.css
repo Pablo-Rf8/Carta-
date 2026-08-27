@@ -99,7 +99,7 @@ body::after {
 .book-page {
   position: absolute;
   inset: 0;
-  padding: clamp(42px, 7vw, 78px) clamp(50px, 8vw, 110px);
+  padding: clamp(38px, 6vw, 64px) clamp(42px, 6vw, 86px);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -107,8 +107,12 @@ body::after {
   transform: translateX(24px);
   pointer-events: none;
   transition: opacity .4s ease, transform .4s ease;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(186,83,109,.35) transparent;
 }
 .book-page.page-active { opacity: 1; transform: translateX(0); pointer-events: auto; }
+.book-open .book-page:not(.book-cover):not(.photo-page):not(.book-ending) { justify-content: flex-start; padding-top: clamp(54px, 7vw, 78px); gap: 8px; }
 .book-open .book-page { inset: 0 auto 0 0; width: 50%; padding-left: clamp(34px, 5vw, 70px); padding-right: clamp(34px, 5vw, 70px); }
 .book-open .book-page.page-companion { left: 50%; opacity: 1; transform: translateX(0); pointer-events: auto; }
 .book-open .book-page.page-active { left: 0; }
@@ -124,19 +128,24 @@ body::after {
   from { opacity: 0; transform: translateX(-70px) rotateY(8deg); }
   to { opacity: 1; transform: translateX(0) rotateY(0); }
 }
+.book-controls { position: relative; z-index: 20; }
 .book-cover { transform-origin: left center; z-index: 5; }
 .book-cover .page-button { position: relative; z-index: 6; pointer-events: auto; }
 .book-open .book-cover { transform: rotateY(-105deg); opacity: 0; pointer-events: none; }
 .book-cover, .book-ending { text-align: center; align-items: center; background: linear-gradient(140deg, #fffaf2, #f8e8df); }
+.book-ending { gap: 14px; }
+.book-ending h2 { max-width: 90%; font-size: clamp(2rem, 5vw, 3.4rem); line-height: 1.05; }
+.book-ending p { margin-bottom: 0; }
 .eyebrow { color: var(--rose); font-size: .68rem; letter-spacing: 2px; text-transform: uppercase; }
 .cover-symbol { color: var(--gold); font-size: 2rem; margin: 24px 0 8px; }
 h1, h2 { font-family: 'Cormorant Garamond', serif; font-weight: 400; margin: 0; }
 h1 { font-size: clamp(3.8rem, 12vw, 6rem); line-height: .78; letter-spacing: 1px; }
 h1 em, h2 em { color: var(--rose); font-style: italic; }
 h2 { font-size: clamp(2.25rem, 7vw, 3.8rem); line-height: .95; }
-.book-page p { max-width: 430px; color: var(--muted); font-size: .9rem; line-height: 1.8; }
+.book-page p { max-width: 430px; margin: 0 0 11px; color: var(--muted); font-size: .95rem; line-height: 1.5; }
+.book-open .book-page:not(.book-cover):not(.photo-page):not(.book-ending) p { max-width: none; font-size: 1.08rem; line-height: 1.48; }
 .book-cover p, .book-ending p { text-align: center; }
-.large-copy { color: var(--ink) !important; font-family: 'Cormorant Garamond', serif; font-size: clamp(1.45rem, 4vw, 1.8rem) !important; line-height: 1.25 !important; }
+.large-copy { color: var(--ink) !important; font-family: 'Cormorant Garamond', serif; font-size: clamp(1.35rem, 3.2vw, 1.7rem) !important; line-height: 1.25 !important; }
 .memory-layout { display: grid; grid-template-columns: minmax(145px, 42%) 1fr; align-items: center; gap: clamp(22px, 5vw, 42px); }
 .photo-page { align-items: center; }
 .photo-page .memory-frame { width: min(100%, 330px); }
@@ -146,7 +155,7 @@ h2 { font-size: clamp(2.25rem, 7vw, 3.8rem); line-height: .95; }
 .book-open .photo-page .memory-frame { width: min(100%, 320px); }
 .book-open .memory-copy h2 { font-size: clamp(2rem, 5vw, 3rem); }
 .book-open .memory-copy .large-copy { font-size: clamp(1.2rem, 2.5vw, 1.5rem) !important; }
-.book-page:not(.book-cover):not(.book-ending) { padding-left: clamp(60px, 9vw, 130px); padding-right: clamp(60px, 9vw, 130px); }
+.book-page:not(.book-cover):not(.book-ending) { padding-left: clamp(38px, 5vw, 68px); padding-right: clamp(38px, 5vw, 68px); }
 .memory-copy { min-width: 0; }
 .memory-frame { position: relative; margin: 0; padding: 10px 10px 28px; background: #fff; box-shadow: 0 14px 28px rgba(48,32,44,.22); transform: rotate(-4deg); }
 .memory-frame::before { content: ''; position: absolute; inset: 5px; border: 1px solid rgba(192,139,67,.5); pointer-events: none; }
@@ -172,12 +181,15 @@ h2 { font-size: clamp(2.25rem, 7vw, 3.8rem); line-height: .95; }
   .book-page { padding: 40px 32px 32px 42px; }
   .page-number { right: 22px; }
   .memory-layout { grid-template-columns: 115px 1fr; gap: 18px; }
-  .book-open .book-page { padding: 40px 18px 32px 26px; }
-  .book-open .book-page.page-companion { padding-left: 18px; padding-right: 26px; }
+  .book-open .book-page { padding: 34px 14px 26px 20px; }
+  .book-open .book-page.page-companion { padding-left: 14px; padding-right: 20px; }
   .book-open .memory-frame { width: min(100%, 130px); margin-bottom: 12px; }
   .book-open .photo-page .memory-frame { width: min(100%, 170px); }
   .book-open .memory-copy h2 { font-size: 1.75rem; }
   .book-open .memory-copy .large-copy { font-size: 1.08rem !important; line-height: 1.2 !important; }
+  .book-open .book-page:not(.book-cover):not(.photo-page):not(.book-ending) { padding-top: 42px; gap: 6px; }
+  .book-open .book-page p { font-size: .78rem; line-height: 1.4; margin-bottom: 8px; }
+  .book-open .book-page:not(.book-cover):not(.photo-page):not(.book-ending) p { font-size: .84rem; line-height: 1.48; }
   .memory-frame { padding-bottom: 24px; }
   .frame-caption { font-size: .5rem; }
 }

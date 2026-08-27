@@ -21,24 +21,34 @@ function showPage(pageIndex, direction = 1) {
   if (currentPage !== 0 || pageIndex !== 0) {
     activePage.classList.add(direction >= 0 ? 'page-enter-next' : 'page-enter-prev');
   }
-  pageIndicator.textContent = `${currentPage + 1} / ${pages.length}`;
+  pageIndicator.textContent = currentPage === 0 ? 'Portada' : `${currentPage} / ${pages.length - 1}`;
   previousButton.disabled = currentPage === 0;
   nextButton.disabled = currentPage === pages.length - 1;
 }
 
-previousButton.addEventListener('click', () => showPage(currentPage - 1, -1));
-nextButton.addEventListener('click', () => {
+function goToPreviousPage() {
+  if (currentPage === 0) return;
+  showPage(currentPage === pages.length - 1 ? currentPage - 1 : currentPage - 2, -1);
+}
+
+function goToNextPage() {
+  if (currentPage === pages.length - 1) return;
   if (currentPage === 0 && !book.classList.contains('book-open')) {
     book.classList.add('book-open');
-    setTimeout(() => showPage(1, 1), 650);
+    showPage(1, 1);
     return;
   }
-  showPage(currentPage + 1, 1);
+  showPage(currentPage === pages.length - 2 ? currentPage + 1 : currentPage + 2, 1);
+}
+
+previousButton.addEventListener('click', goToPreviousPage);
+nextButton.addEventListener('click', () => {
+  goToNextPage();
 });
 
 document.addEventListener('keydown', (event) => {
-  if (event.key === 'ArrowLeft') showPage(currentPage - 1, -1);
-  if (event.key === 'ArrowRight') showPage(currentPage + 1, 1);
+  if (event.key === 'ArrowLeft') goToPreviousPage();
+  if (event.key === 'ArrowRight') goToNextPage();
 });
 
 showPage(0);

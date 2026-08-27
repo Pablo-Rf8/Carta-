@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="libro.css" />
 </head>
 <body>
+  <!-- Fondo de video -->
   <video class="book-video" autoplay muted loop playsinline aria-hidden="true">
     <source src="videos/fondo.mp4" type="video/mp4">
   </video>
@@ -19,6 +20,8 @@
     <a class="back-link" href="cielo.html" aria-label="Volver al cielo">← volver al cielo</a>
 
     <section class="book" id="book" aria-label="Nuestro libro de recuerdos">
+      
+      <!-- PORTADA[cite: 14] -->
       <div class="book-page book-cover page-active" data-page="0">
         <span class="eyebrow">Un pequeño lugar para nosotros</span>
         <div class="cover-symbol" aria-hidden="true">✦</div>
@@ -26,35 +29,71 @@
         <p>Capítulo primero: el comienzo de algo bonito.</p>
       </div>
 
+      <!-- PÁGINA 1: Tu yo de chiquito -->
       <div class="book-page photo-page" data-page="1">
-        <span class="page-number">01 / 03</span>
-        <figure class="memory-frame">
-          <span class="frame-corner frame-corner--top" aria-hidden="true">✦</span>
-          <img src="img/YoMIsmo.jpeg" alt="Yo de pequeño">
-          <span class="frame-caption">yo, hace algunos años</span>
-          <span class="frame-corner frame-corner--bottom" aria-hidden="true">✦</span>
-        </figure>
+        <span class="page-number">01 / 06</span>
+        <div class="memory-layout">
+          <figure class="memory-frame">
+            <span class="frame-corner frame-corner--top" aria-hidden="true">✦</span>
+            <img src="img/YoMIsmo.jpeg" alt="Yo de pequeño">
+            <span class="frame-caption">Mi yo de chiquito</span>
+            <span class="frame-corner frame-corner--bottom" aria-hidden="true">✦</span>
+          </figure>
+        </div>
       </div>
 
+      <!-- PÁGINA 2: Primera parte de la carta -->
       <div class="book-page" data-page="2">
-        <span class="page-number">02 / 03</span>
+        <span class="page-number">02 / 06</span>
+        <p class="large-copy">No solamente yo te amo, también te ama mi yo de pequeño...</p>
+        <p>Y si algún día te vas no sé qué haré la verdad. Eres lo mejor que me ha pasado en mucho tiempo.</p>
+        <p>Me da un miedo gigante perderte alguna vez. Mi corazón de verdad late por ti, se muere por ti.</p>
       </div>
 
-      <div class="book-page book-ending" data-page="3">
-        <span class="page-number">03 / 03</span>
+      <!-- PÁGINA 3: Sentimientos -->
+      <div class="book-page" data-page="3">
+        <span class="page-number">03 / 06</span>
+        <p>Y cada vez que te digo algo bonito o bromeo contigo, no soy yo, es mi yo de chiquito.</p>
+        <p>Él es quien te ama demasiado. No sabes el montón de sentimientos que salen de mi corazón a diario; te amo con todo mi corazón de verdad.</p>
+        <p>Yo sé que tengo mis propios problemas, mis miedos y todo eso, y espero de verdad superarlo para ser el hombre que ames.</p>
+      </div>
+
+      <!-- PÁGINA 4: Segunda parte de la carta -->
+      <div class="book-page" data-page="4">
+        <span class="page-number">04 / 06</span>
+        <div class="page-rule" aria-hidden="true"></div>
+
+        <p>Te hice esta cartita con todo mi amor. Esto no es nada, es solo la punta del iceberg.</p>
+        <p>Mi corazón me dice que contigo va a ser muy pero muy diferente, y de verdad lo espero.</p>
+        <p>Tengo tantas ilusiones y tantas cosas que quiero experimentar contigo; mi amor se desborda por ti.</p>
+      </div>
+
+      <!-- PÁGINA 5: Cita especial -->
+      <div class="book-page" data-page="5">
+        <span class="page-number">05 / 06</span>
+        <p>Como dice Ludwig van Beethoven:</p>
+        <p><em>"Mi corazón está lleno de tantas cosas que decirte... Ah, dondequiera que yo esté, tú estás conmigo."</em></p>
+        <p><em>"Eres mi ángel, mi todo, mi yo."</em></p>
+      </div>
+
+      <!-- PÁGINA 6: Despedida -->
+      <div class="book-page book-ending" data-page="6">
+        <span class="page-number">06 / 06</span>
         <div class="cover-symbol" aria-hidden="true">♡</div>
-        <h2>Y si esto es<br><em>el comienzo...</em></h2>
+        <h2>Y si esto es<br><em>el comienzo de lo que siento por ti</em></h2>
         <p>que vengan muchas páginas más a tu lado.</p>
         <span class="signature">Tu bb</span>
       </div>
     </section>
 
+    <!-- Controles[cite: 14] -->
     <div class="book-controls" aria-label="Controles del libro">
       <button class="control-button" id="previousButton" aria-label="Página anterior">←</button>
-      <span id="pageIndicator">1 / 4</span>
+      <span id="pageIndicator">Portada</span>
       <button class="control-button" id="nextButton" aria-label="Página siguiente">→</button>
     </div>
   </main>
+  
   <script src="libro.js"></script>
 </body>
 </html>
