@@ -23,7 +23,11 @@
 
   <!-- ESCENARIO CINEMÁTICO: cielo, sol gigante, pájaros, montañas y estrellas -->
 <div class="scene" aria-hidden="true">
-    <div class="sky" id="sky"></div>
+    <div class="sky" id="sky">
+      <div class="sky-layer sky-layer--dawn"></div>
+      <div class="sky-layer sky-layer--sunset" id="skySunsetLayer"></div>
+      <div class="sky-layer sky-layer--night" id="skyNightLayer"></div>
+    </div>
 
     <div class="stars" id="stars"></div>
     <!-- NUEVO: Contenedor para estrellas fugaces -->
@@ -32,6 +36,9 @@
     <div class="moon" id="moon"></div>
 
     <div class="sun-glow" id="sunGlow"></div>
+    <div class="sun-rays" id="sunRays">
+      <div class="sun-rays__spin"></div>
+    </div>
     <div class="sun-halo" id="sunHalo"></div>
     <div class="sun" id="sun"></div>
 
@@ -43,9 +50,21 @@
       <span class="bird bird--5"></span>
     </div>
 
-    <div class="mountain mountain--back" id="mountainBack"></div>
-    <div class="mountain mountain--mid" id="mountainMid"></div>
-    <div class="mountain mountain--front" id="mountainFront"></div>
+    <div class="mountain mountain--back" id="mountainBack">
+      <span class="mountain-layer mountain-layer--dawn"></span>
+      <span class="mountain-layer mountain-layer--sunset" id="mtnBackSunset"></span>
+      <span class="mountain-layer mountain-layer--night" id="mtnBackNight"></span>
+    </div>
+    <div class="mountain mountain--mid" id="mountainMid">
+      <span class="mountain-layer mountain-layer--dawn"></span>
+      <span class="mountain-layer mountain-layer--sunset" id="mtnMidSunset"></span>
+      <span class="mountain-layer mountain-layer--night" id="mtnMidNight"></span>
+    </div>
+    <div class="mountain mountain--front" id="mountainFront">
+      <span class="mountain-layer mountain-layer--dawn"></span>
+      <span class="mountain-layer mountain-layer--sunset" id="mtnFrontSunset"></span>
+      <span class="mountain-layer mountain-layer--night" id="mtnFrontNight"></span>
+    </div>
   </div>
 
   <!-- Indicador lateral de navegación -->

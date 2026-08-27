@@ -12,11 +12,20 @@ const moonEl = document.getElementById('moon');
 const sunEl = document.getElementById('sun');
 const sunHaloEl = document.getElementById('sunHalo');
 const sunGlowEl = document.getElementById('sunGlow');
+const sunRaysEl = document.getElementById('sunRays');
 const flockEl = document.getElementById('flock');
 const birdEls = flockEl.querySelectorAll('.bird');
 const mountainBack = document.getElementById('mountainBack');
 const mountainMid = document.getElementById('mountainMid');
 const mountainFront = document.getElementById('mountainFront');
+const skySunsetLayer = document.getElementById('skySunsetLayer');
+const skyNightLayer = document.getElementById('skyNightLayer');
+const mtnBackSunset = document.getElementById('mtnBackSunset');
+const mtnBackNight = document.getElementById('mtnBackNight');
+const mtnMidSunset = document.getElementById('mtnMidSunset');
+const mtnMidNight = document.getElementById('mtnMidNight');
+const mtnFrontSunset = document.getElementById('mtnFrontSunset');
+const mtnFrontNight = document.getElementById('mtnFrontNight');
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -153,14 +162,18 @@ for (let i = 0; i < STAR_COUNT; i++) {
 /* =========================================================
    4.5 GENERAR ESTRELLAS FUGACES ALEATORIAS
    ========================================================= */
-const SHOOTING_STAR_COUNT = 8;
+const SHOOTING_STAR_COUNT = 22;
 for (let i = 0; i < SHOOTING_STAR_COUNT; i++) {
   const sStar = document.createElement('span');
   sStar.className = 'shooting-star';
   sStar.style.left = `${(Math.random() * 90).toFixed(2)}%`;
   sStar.style.top = `${(Math.random() * 80).toFixed(2)}%`;
-  sStar.style.setProperty('--dur', `${(Math.random() * 2 + 2.5).toFixed(2)}s`);
-  sStar.style.setProperty('--delay', `${(Math.random() * 6).toFixed(2)}s`);
+  sStar.style.setProperty('--dur', `${(Math.random() * 1.8 + 1.8).toFixed(2)}s`);
+  /* delay repartido a lo largo de todo el ciclo (no aleatorio puro) para que
+     siempre haya varias estrellas cruzando y no se agrupen todas de golpe */
+  const spreadDelay = (i / SHOOTING_STAR_COUNT) * 8 + Math.random() * 0.6;
+  sStar.style.setProperty('--delay', `${spreadDelay.toFixed(2)}s`);
+  sStar.style.setProperty('--len', `${Math.round(Math.random() * 90 + 70)}px`);
   shootingStarsEl.appendChild(sStar);
 }
 
@@ -176,22 +189,9 @@ function smoothstep(edge0, edge1, x) {
 function easeOutCubic(x) { return 1 - Math.pow(1 - x, 3); }
 function easeInCubic(x) { return x * x * x; }
 
-function hexToRgb(hex) {
-  const n = parseInt(hex.slice(1), 16);
-  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
-}
-function lerpColor(hexA, hexB, t) {
-  const a = hexToRgb(hexA);
-  const b = hexToRgb(hexB);
-  return `rgb(${Math.round(lerp(a.r, b.r, t))}, ${Math.round(lerp(a.g, b.g, t))}, ${Math.round(lerp(a.b, b.b, t))})`;
-}
-
-/* Interpola 3 paradas clave en los puntos exactos del brief: 0% dawn, 35–70% sunset (plateau), 100% night */
-function threeStopLerp(hexA, hexB, hexC, t) {
-  if (t <= 0.35) return lerpColor(hexA, hexB, t / 0.35);
-  if (t <= 0.7) return hexB;
-  return lerpColor(hexB, hexC, (t - 0.7) / 0.3);
-}
+/* Interpola solo lo que de verdad necesita mezclarse por JS (nada de color ya:
+   el cielo y las montañas ahora son capas CSS pre-pintadas que se funden con
+   opacity, así el navegador no repinta un gradiente completo en cada frame). */
 
 /* Factor de "altura de sol" (0→1→0) con meseta dorada entre 35–70% */
 function sunHeightFactor(t) {
@@ -200,35 +200,42 @@ function sunHeightFactor(t) {
   return 1 - easeInCubic((t - 0.7) / 0.3);
 }
 
-/* =========================================================
-   6. PALETAS
-   ========================================================= */
-const SKY = {
-  top:     { dawn: '#33204a', sunset: '#3a0f1f', night: '#05081a' },
-  mid:     { dawn: '#7a3a58', sunset: '#8a2e2c', night: '#0c1442' },
-  horizon: { dawn: '#ffb385', sunset: '#ff7b3d', night: '#141c3f' }
-};
+/* Opacidad de las capas "atardecer" y "noche": crossfade puro por opacity,
+   la manera más barata posible de animar color en el navegador (GPU, sin repintado). */
+function phaseOpacities(t) {
+  return {
+    sunsetOn: smoothstep(0, 0.35, t),
+    nightOn: smoothstep(0.7, 1, t)
+  };
+}
 
-const MOUNTAIN = {
-  back:  { dawn: '#4a3163', sunset: '#7a3d3a', night: '#0d1230' },
-  mid:   { dawn: '#3a2350', sunset: '#5c2a2f', night: '#080b20' },
-  front: { dawn: '#2a1840', sunset: '#3c1a24', night: '#040613' }
+/* Valores base recalculados en cada tick de scroll; el loop ambiental (más abajo)
+   les suma pequeñas oscilaciones continuas para que la escena respire aunque
+   el usuario no esté scrolleando. */
+const sceneBase = {
+  sunY: 0,
+  sunOpacity: 1,
+  heightFactor: 0,
+  moonY: 30,
+  moonOpacity: 0,
+  flightProgress: 0
 };
 
 /* =========================================================
    7. PINTAR LA ESCENA EN CADA TICK DEL SCRUB
    ========================================================= */
 function updateScene(t) {
-  /* --- cielo --- */
-  const top = threeStopLerp(SKY.top.dawn, SKY.top.sunset, SKY.top.night, t);
-  const mid = threeStopLerp(SKY.mid.dawn, SKY.mid.sunset, SKY.mid.night, t);
-  const horizon = threeStopLerp(SKY.horizon.dawn, SKY.horizon.sunset, SKY.horizon.night, t);
-  skyEl.style.background = `linear-gradient(to bottom, ${top} 0%, ${mid} 55%, ${horizon} 100%)`;
+  /* --- cielo: crossfade de 3 capas ya pintadas, solo se anima opacity (GPU) --- */
+  const { sunsetOn, nightOn } = phaseOpacities(t);
+  gsap.set(skySunsetLayer, { opacity: sunsetOn });
+  gsap.set(skyNightLayer, { opacity: nightOn });
 
-  /* --- montañas --- */
-  mountainBack.style.backgroundColor = threeStopLerp(MOUNTAIN.back.dawn, MOUNTAIN.back.sunset, MOUNTAIN.back.night, t);
-  mountainMid.style.backgroundColor = threeStopLerp(MOUNTAIN.mid.dawn, MOUNTAIN.mid.sunset, MOUNTAIN.mid.night, t);
-  mountainFront.style.backgroundColor = threeStopLerp(MOUNTAIN.front.dawn, MOUNTAIN.front.sunset, MOUNTAIN.front.night, t);
+  /* --- montañas: mismo crossfade + ligero paralaje de profundidad --- */
+  gsap.set([mtnBackSunset, mtnMidSunset, mtnFrontSunset], { opacity: sunsetOn });
+  gsap.set([mtnBackNight, mtnMidNight, mtnFrontNight], { opacity: nightOn });
+  gsap.set(mountainBack, { y: t * -6 });
+  gsap.set(mountainMid, { y: t * -13 });
+  gsap.set(mountainFront, { y: t * -22 });
 
   /* --- sol: asciende 0–35%, brilla al máximo 35–70%, se oculta tras las montañas 70–100% --- */
   const heightFactor = sunHeightFactor(t);
@@ -238,27 +245,32 @@ function updateScene(t) {
   const sunY = groundOffset - heightFactor * riseAmplitude;
   const sunOpacity = t < 0.92 ? 1 : 1 - (t - 0.92) / 0.08;
 
+  sceneBase.sunY = sunY;
+  sceneBase.sunOpacity = sunOpacity;
+  sceneBase.heightFactor = heightFactor;
+
   gsap.set(sunEl, { y: sunY, opacity: sunOpacity, filter: `brightness(${1 + heightFactor * 0.18})` });
   gsap.set(sunHaloEl, { y: sunY, opacity: sunOpacity * (0.35 + heightFactor * 0.65), scale: 0.85 + heightFactor * 0.3 });
   gsap.set(sunGlowEl, { y: sunY, opacity: sunOpacity * (0.3 + heightFactor * 0.6), scale: 0.8 + heightFactor * 0.35 });
+  gsap.set(sunRaysEl, { y: sunY, opacity: sunOpacity * heightFactor * 0.85, scale: 0.75 + heightFactor * 0.4 });
 
   /* --- luna: emerge al llegar la noche --- */
   const moonOpacity = smoothstep(0.75, 0.97, t);
-  gsap.set(moonEl, { opacity: moonOpacity, y: (1 - moonOpacity) * 30 });
+  sceneBase.moonOpacity = moonOpacity;
+  sceneBase.moonY = (1 - moonOpacity) * 30;
+  gsap.set(moonEl, { opacity: moonOpacity });
 
   /* --- estrellas --- */
   gsap.set(starsEl, { opacity: smoothstep(0.68, 0.95, t) });
   gsap.set(shootingStarsEl, { opacity: smoothstep(0.72, 0.96, t) });
 
-  /* --- bandada de pájaros cruzando en el atardecer (35–70%) --- */
+  /* --- bandada de pájaros cruzando en el atardecer (35–70%), en formación --- */
   const flockWindow = smoothstep(0.3, 0.4, t) * (1 - smoothstep(0.66, 0.76, t));
   const flightProgress = clamp((t - 0.32) / 0.4, 0, 1);
-  const flockX = lerp(-15, 115, flightProgress);
-  gsap.set(flockEl, { opacity: flockWindow, xPercent: 0, x: `${flockX}vw` });
-
-  birdEls.forEach((bird, i) => {
-    gsap.set(bird, { y: Math.sin(flightProgress * 6 + i) * 10 });
-  });
+  sceneBase.flightProgress = flightProgress;
+  const flockX = lerp(-18, 118, flightProgress);
+  const flockDrop = flightProgress * 6; // leve descenso al cruzar, como planeando
+  gsap.set(flockEl, { opacity: flockWindow, x: `${flockX}vw`, y: flockDrop });
 }
 
 /* =========================================================
@@ -282,6 +294,35 @@ gsap.timeline({
 });
 
 updateScene(0);
+
+/* =========================================================
+   9. LOOP AMBIENTAL: respiración del sol, flotación de la luna y
+      vuelo de los pájaros — corre siempre, no solo mientras se scrollea.
+   Se cuelga del propio ticker de GSAP (el mismo que usa ScrollTrigger)
+   en lugar de abrir un requestAnimationFrame paralelo, para que todo
+   se actualice en el mismo frame y no haya "tirones" entre relojes.
+   ========================================================= */
+function ambientTick(seconds) {
+  if (prefersReducedMotion) return;
+
+  /* el sol "respira": un pulso de escala muy sutil, más notorio cuando ya está alto */
+  const sunPulse = 1 + Math.sin(seconds * 0.6) * 0.012 * (0.3 + sceneBase.heightFactor);
+  gsap.set(sunEl, { scale: sunPulse });
+  gsap.set(sunHaloEl, { scale: (0.85 + sceneBase.heightFactor * 0.3) * (1 + Math.sin(seconds * 0.6) * 0.02) });
+
+  /* la luna flota despacio sobre su posición base */
+  if (sceneBase.moonOpacity > 0.01) {
+    gsap.set(moonEl, { y: sceneBase.moonY + Math.sin(seconds * 0.35) * 7 });
+  }
+
+  /* los pájaros ondulan en su trayectoria y se inclinan según su velocidad vertical */
+  birdEls.forEach((bird, i) => {
+    const bob = Math.sin(seconds * 2.4 + i * 1.1) * 9;
+    const tilt = Math.cos(seconds * 2.4 + i * 1.1) * 10;
+    gsap.set(bird, { y: bob, rotation: tilt });
+  });
+}
+gsap.ticker.add(ambientTick);
 
 requestAnimationFrame(() => {
   document.body.classList.add('page-ready');

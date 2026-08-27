@@ -53,7 +53,27 @@ body.page-ready .page-transition {
 .sky {
   position: absolute;
   inset: 0;
-  will-change: background;
+  contain: strict;
+}
+
+.sky-layer {
+  position: absolute;
+  inset: 0;
+  will-change: opacity;
+}
+
+.sky-layer--dawn {
+  background: linear-gradient(to bottom, #33204a 0%, #7a3a58 55%, #ffb385 100%);
+}
+
+.sky-layer--sunset {
+  background: linear-gradient(to bottom, #3a0f1f 0%, #8a2e2c 55%, #ff7b3d 100%);
+  opacity: 0;
+}
+
+.sky-layer--night {
+  background: linear-gradient(to bottom, #05081a 0%, #0c1442 55%, #141c3f 100%);
+  opacity: 0;
 }
 
 /* ESTRELLAS: puntos generados por JS, titileo en loop constante */
@@ -61,6 +81,7 @@ body.page-ready .page-transition {
   position: absolute;
   inset: 0;
   opacity: 0;
+  contain: strict;
 }
 
 .star {
@@ -69,41 +90,6 @@ body.page-ready .page-transition {
   background: #ffffff;
   animation: twinkle var(--dur, 3s) ease-in-out infinite;
   animation-delay: var(--delay, 0s);
-}
-
-.shooting-stars {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  opacity: 0;
-}
-
-.shooting-star {
-  position: absolute;
-  width: 110px;
-  height: 2px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, transparent, #ffffff 35%, #f4d06f);
-  box-shadow: 0 0 8px 1px rgba(255, 255, 255, 0.8);
-  transform: translate(-140px, -140px) rotate(35deg);
-  transform-origin: left center;
-  animation: shooting-star var(--dur, 3s) linear infinite;
-  animation-delay: var(--delay, 0s);
-}
-
-@keyframes shooting-star {
-  0% {
-    opacity: 0;
-    transform: translate(-140px, -140px) rotate(35deg);
-  }
-  15% {
-    opacity: 1;
-  }
-  45%, 100% {
-    opacity: 0;
-    transform: translate(320px, 320px) rotate(35deg);
-  }
 }
 
 @keyframes twinkle {
@@ -122,6 +108,7 @@ body.page-ready .page-transition {
   background: radial-gradient(circle at 35% 32%, #ffffff, #dbe4ff 55%, #a9b6e6 100%);
   box-shadow: 0 0 40px 14px rgba(210, 220, 255, 0.45), 0 0 90px 40px rgba(180, 195, 255, 0.2);
   opacity: 0;
+  will-change: transform, opacity;
 }
 
 /* SOL GIGANTE: degradado cálido vibrante */
@@ -135,6 +122,40 @@ body.page-ready .page-transition {
   transform: translate(-50%, -50%);
   background: linear-gradient(#fff, #ffcf40, #ff5e36);
   box-shadow: 0 0 60px 15px rgba(255, 190, 90, 0.55);
+  will-change: transform, opacity, filter;
+}
+
+/* RAYOS DE SOL: sunburst giratorio, más intenso en la hora dorada.
+   El contenedor .sun-rays solo lo mueve/escala GSAP (posición); la rotación
+   vive en un hijo aparte para que la animación CSS no le pise el transform. */
+.sun-rays {
+  position: absolute;
+  left: 50%;
+  top: 55%;
+  width: min(120vw, 900px);
+  height: min(120vw, 900px);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.sun-rays__spin {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    rgba(255, 221, 160, 0.32) 0deg 3deg,
+    transparent 3deg 18deg
+  );
+  -webkit-mask-image: radial-gradient(circle, #000 18%, transparent 68%);
+  mask-image: radial-gradient(circle, #000 18%, transparent 68%);
+  animation: rotateRays 90s linear infinite;
+  will-change: transform;
+}
+
+@keyframes rotateRays {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* HALO de resplandor expansivo, capas de box-shadow */
@@ -151,6 +172,7 @@ body.page-ready .page-transition {
     0 0 160px 70px rgba(255, 142, 64, 0.35),
     0 0 280px 130px rgba(255, 94, 54, 0.22),
     0 0 440px 200px rgba(255, 60, 40, 0.12);
+  will-change: transform, opacity;
 }
 
 /* GLOW atmosférico, degradado radial de luz */
@@ -163,6 +185,7 @@ body.page-ready .page-transition {
   border-radius: 50%;
   transform: translate(-50%, -50%);
   background: radial-gradient(circle, rgba(255, 100, 20, 0.4), rgba(255, 100, 20, 0) 70%);
+  will-change: transform, opacity;
 }
 
 /* PÁJAROS: silueta CSS con aleteo constante en loop */
@@ -172,6 +195,7 @@ body.page-ready .page-transition {
   left: 0;
   width: 100%;
   height: 120px;
+  will-change: transform, opacity;
 }
 
 .bird {
@@ -206,14 +230,14 @@ body.page-ready .page-transition {
   animation: flap-right 0.55s ease-in-out infinite alternate;
 }
 
-.bird--1 { transform: scale(1.1); }
-.bird--2 { transform: scale(0.85); }
+.bird--1 { top: 8px; left: 0px; transform: scale(1.1); }
+.bird--2 { top: -4px; left: 36px; transform: scale(0.85); }
 .bird--2::before, .bird--2::after { animation-delay: 0.08s; }
-.bird--3 { transform: scale(1.3); }
+.bird--3 { top: 22px; left: 64px; transform: scale(1.3); }
 .bird--3::before, .bird--3::after { animation-delay: 0.16s; }
-.bird--4 { transform: scale(0.7); }
+.bird--4 { top: 2px; left: 100px; transform: scale(0.7); }
 .bird--4::before, .bird--4::after { animation-delay: 0.24s; }
-.bird--5 { transform: scale(1); }
+.bird--5 { top: 30px; left: 132px; transform: scale(1); }
 .bird--5::before, .bird--5::after { animation-delay: 0.32s; }
 
 @keyframes flap-left {
@@ -232,8 +256,26 @@ body.page-ready .page-transition {
   bottom: 0;
   left: 0;
   width: 100%;
-  will-change: background-color;
+  contain: strict;
 }
+
+.mountain-layer {
+  position: absolute;
+  inset: 0;
+  will-change: opacity;
+}
+
+.mountain--back .mountain-layer--dawn   { background: #4a3163; }
+.mountain--back .mountain-layer--sunset { background: #7a3d3a; opacity: 0; }
+.mountain--back .mountain-layer--night  { background: #0d1230; opacity: 0; }
+
+.mountain--mid .mountain-layer--dawn   { background: #3a2350; }
+.mountain--mid .mountain-layer--sunset { background: #5c2a2f; opacity: 0; }
+.mountain--mid .mountain-layer--night  { background: #080b20; opacity: 0; }
+
+.mountain--front .mountain-layer--dawn   { background: #2a1840; }
+.mountain--front .mountain-layer--sunset { background: #3c1a24; opacity: 0; }
+.mountain--front .mountain-layer--night  { background: #040613; opacity: 0; }
 
 .mountain--back {
   height: 34vh;
@@ -520,6 +562,8 @@ body.page-ready .page-transition {
   .counter-display {
     gap: 4px;
   }
+}
+
 /* =========================================================
    ESTRELLAS FUGACES (Se activan en la Noche)
    ========================================================= */
@@ -541,7 +585,7 @@ body.page-ready .page-transition {
   background: linear-gradient(-45deg, #ffffff, rgba(160, 200, 255, 0.8), rgba(0, 0, 255, 0));
   border-radius: 999px;
   filter: drop-shadow(0 0 8px rgba(180, 220, 255, 1));
-  animation: 
+  animation:
     tail var(--dur, 3s) ease-in-out infinite,
     shooting var(--dur, 3s) ease-in-out infinite;
   animation-delay: var(--delay, 0s);
@@ -573,7 +617,7 @@ body.page-ready .page-transition {
 
 @keyframes tail {
   0% { width: 0; }
-  30% { width: 120px; }
+  30% { width: var(--len, 120px); }
   100% { width: 0; }
 }
 
@@ -581,6 +625,4 @@ body.page-ready .page-transition {
   0% { width: 0; }
   50% { width: 28px; }
   100% { width: 0; }
-}
-
 }
