@@ -3,7 +3,14 @@ const previousButton = document.getElementById('previousButton');
 const nextButton = document.getElementById('nextButton');
 const pageIndicator = document.getElementById('pageIndicator');
 const book = document.getElementById('book');
+// En celular no hay espacio para mostrar 2 páginas lado a lado,
+// así que ahí el libro siempre se navega de a 1 página a pantalla completa.
+const mobileQuery = window.matchMedia('(max-width: 480px)');
 let currentPage = 0;
+
+function isSpread() {
+  return book.classList.contains('book-open') && !mobileQuery.matches;
+}
 
 function showPage(pageIndex, direction = 1) {
   const targetPage = Math.max(0, Math.min(pageIndex, pages.length - 1));
@@ -21,13 +28,13 @@ function showPage(pageIndex, direction = 1) {
     if (index === currentPage) {
       page.classList.add('page-active');
       page.classList.add(direction >= 0 ? 'page-enter-next' : 'page-enter-prev');
-    } else if (book.classList.contains('book-open') && index === currentPage + 1) {
+    } else if (isSpread() && index === currentPage + 1) {
       page.classList.add('page-companion');
     }
   });
   
-  // Aplicar estilos especiales para última página
-  book.classList.toggle('book-single-end', currentPage === pages.length - 1 && book.classList.contains('book-open'));
+  // Aplicar estilos especiales para última página (solo aplica en modo "spread")
+  book.classList.toggle('book-single-end', isSpread() && currentPage === pages.length - 1);
   
   // Actualizar indicador de página
   pageIndicator.textContent = currentPage === 0 ? 'Portada' : `${currentPage} / ${pages.length - 1}`;
@@ -44,11 +51,14 @@ function goToPreviousPage() {
     // Si estamos en página 1 con el libro abierto, cerrar y volver a portada
     book.classList.remove('book-open', 'book-single-end');
     showPage(0, -1);
-  } else if (book.classList.contains('book-open')) {
-    // Si el libro está abierto, retroceder 2 páginas
+  } else if (isSpread() && book.classList.contains('book-single-end')) {
+    // Veníamos de la última página mostrada sola: volver a su pareja (n-1, n)
+    showPage(currentPage - 1, -1);
+  } else if (isSpread()) {
+    // Modo de 2 páginas (escritorio): retroceder de a 2
     showPage(currentPage - 2, -1);
   } else {
-    // Si el libro está cerrado, retroceder 1 página
+    // Modo de 1 página (celular, o libro cerrado): retroceder de a 1
     showPage(currentPage - 1, -1);
   }
 }
@@ -60,14 +70,18 @@ function goToNextPage() {
     // Abrir el libro desde la portada
     book.classList.add('book-open');
     showPage(1, 1);
-  } else if (book.classList.contains('book-open')) {
-    // Si el libro está abierto, avanzar 2 páginas
+  } else if (isSpread()) {
+    // Modo de 2 páginas (escritorio): avanzar de a 2
     showPage(currentPage + 2, 1);
   } else {
-    // Si el libro está cerrado, avanzar 1 página
+    // Modo de 1 página (celular, o libro cerrado): avanzar de a 1
     showPage(currentPage + 1, 1);
   }
 }
+
+// Si el usuario rota el celular o cambia de tamaño de ventana cruzando el
+// límite móvil/escritorio, volvemos a calcular cómo debe verse la página actual.
+mobileQuery.addEventListener('change', () => showPage(currentPage));
 
 previousButton.addEventListener('click', goToPreviousPage);
 nextButton.addEventListener('click', () => {
