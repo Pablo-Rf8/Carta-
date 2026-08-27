@@ -8,6 +8,16 @@ const flowerImages = [
   'img/flor4.png'
 ];
 
+/* Se decodifican las 4 imágenes apenas carga el script (no en el clic), así
+   cuando el usuario toca el sobre el navegador ya las tiene listas en caché
+   y decodificadas, en vez de tener que hacerlo de golpe justo cuando arranca
+   la animación del corazón. */
+flowerImages.forEach((src) => {
+  const preloadImg = new Image();
+  preloadImg.src = src;
+  if (preloadImg.decode) preloadImg.decode().catch(() => {});
+});
+
 const letterMessage = `Hoy cumplimos nuestro primer mes juntos y quería hacerte algo especial que durara para siempre.
 
 Si tuviera que describirte con una sola palabra, serías mi cielo: inmenso, hermoso y el lugar donde siempre encuentro calma cuando miro hacia arriba.
@@ -72,15 +82,15 @@ function abrirCarta() {
 function startTypewriter() {
   let index = 0;
   const speed = 36; // Velocidad de escritura en milisegundos
+  const letterBody = document.querySelector('.letter-body'); // se busca UNA sola vez
 
   function type() {
     if (index < letterMessage.length) {
       typedTextEl.textContent += letterMessage.charAt(index);
       index++;
-      // Hacer autoscroll mientras escribe si el texto es muy largo
-      const letterBody = document.querySelector('.letter-body');
+      // Autoscroll mientras escribe si el texto es muy largo
       letterBody.scrollTop = letterBody.scrollHeight;
-      
+
       setTimeout(type, speed);
     } else {
       cursorEl.style.display = 'none';
@@ -152,11 +162,16 @@ function triggerFlowerBloom() {
     const size = Math.floor(Math.random() * 30 + 85);
 
     img.src = flowerImages[i % flowerImages.length];
-    img.style.setProperty('--tx', `${tx}px`);
-    img.style.setProperty('--ty', `${ty}px`);
-    img.style.setProperty('--rot', `${rot}deg`);
-    img.style.setProperty('--scale', scale);
-    img.style.setProperty('--size', `${size}px`);
+    img.loading = 'eager';
+    img.decoding = 'async';
+    // Una sola escritura de estilo en vez de 4 (menos recálculos de layout)
+    img.style.cssText = `--tx:${tx}px; --ty:${ty}px; --rot:${rot}deg; --scale:${scale}; --size:${size}px;`;
+
+    // Libera la capa de composición apenas termina de animarse esta flor;
+    // así no quedan 120 capas GPU promovidas para siempre una vez formado el corazón.
+    img.addEventListener('transitionend', () => {
+      img.style.willChange = 'auto';
+    }, { once: true });
 
     bloomContainer.appendChild(img);
 

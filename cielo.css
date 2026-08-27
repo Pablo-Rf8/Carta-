@@ -476,6 +476,24 @@ body.page-ready .page-transition {
   color: var(--rose);
 }
 
+.book-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  color: var(--gold);
+  font-size: 0.82rem;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.book-link:hover,
+.book-link:focus-visible {
+  color: #fff;
+  transform: translateX(4px);
+}
+
 .back-top-btn {
   margin-top: 16px;
   font-size: 0.8rem;

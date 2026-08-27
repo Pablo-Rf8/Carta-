@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nuestro Libro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Dancing+Script:wght@600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="libro.css" />
+</head>
+<body>
+  <video class="book-video" autoplay muted loop playsinline aria-hidden="true">
+    <source src="videos/fondo.mp4" type="video/mp4">
+  </video>
+  <div class="video-shade" aria-hidden="true"></div>
+
+  <main class="book-shell">
+    <a class="back-link" href="cielo.html" aria-label="Volver al cielo">← volver al cielo</a>
+
+    <section class="book" id="book" aria-label="Nuestro libro de recuerdos">
+      <div class="book-page book-cover page-active" data-page="0">
+        <span class="eyebrow">Un pequeño lugar para nosotros</span>
+        <div class="cover-symbol" aria-hidden="true">✦</div>
+        <h1>Nuestro<br><em>libro</em></h1>
+        <p>Capítulo primero: el comienzo de algo bonito.</p>
+        <button class="page-button" id="openBookButton" data-direction="next">abrir el libro <span>→</span></button>
+      </div>
+
+      <div class="book-page" data-page="1">
+        <span class="page-number">01 / 03</span>
+        <div class="memory-layout">
+          <figure class="memory-frame">
+            <span class="frame-corner frame-corner--top" aria-hidden="true">✦</span>
+            <img src="img/YoMIsmo.jpeg" alt="Yo de pequeño">
+            <span class="frame-caption">yo, hace algunos años</span>
+            <span class="frame-corner frame-corner--bottom" aria-hidden="true">✦</span>
+          </figure>
+          <div class="memory-copy">
+            <span class="eyebrow">Una confesión</span>
+            <h2>Las pequeñas cosas</h2>
+            <div class="page-rule"></div>
+            <p class="large-copy" id="memoryMessage"></p>
+          </div>
+        </div>
+        <button class="page-button page-button--quiet" data-direction="next">siguiente página <span>→</span></button>
+      </div>
+
+      <div class="book-page" data-page="2">
+        <span class="page-number">02 / 03</span>
+        <span class="eyebrow">Lo que deseo</span>
+        <h2>Seguir sumando días</h2>
+        <div class="page-rule"></div>
+        <p class="large-copy">Quiero seguir conociendo tus lugares, tus sueños y todas las versiones de ti que todavía nos quedan por descubrir.</p>
+        <p>Sin prisa. Con el corazón despierto y la mano siempre buscando la tuya.</p>
+        <button class="page-button page-button--quiet" data-direction="next">última página <span>→</span></button>
+      </div>
+
+      <div class="book-page book-ending" data-page="3">
+        <span class="page-number">03 / 03</span>
+        <div class="cover-symbol" aria-hidden="true">♡</div>
+        <h2>Y si esto es<br><em>el comienzo...</em></h2>
+        <p>que vengan muchas páginas más a tu lado.</p>
+        <span class="signature">Tu bb</span>
+        <button class="page-button page-button--quiet" data-direction="restart">volver a leer <span>↺</span></button>
+      </div>
+    </section>
+
+    <div class="book-controls" aria-label="Controles del libro">
+      <button class="control-button" id="previousButton" aria-label="Página anterior">←</button>
+      <span id="pageIndicator">1 / 4</span>
+      <button class="control-button" id="nextButton" aria-label="Página siguiente">→</button>
+    </div>
+  </main>
+  <script src="libro.js"></script>
+</body>
+</html>
