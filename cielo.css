@@ -479,19 +479,38 @@ body.page-ready .page-transition {
 .book-link {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  margin-top: 18px;
-  color: var(--gold);
-  font-size: 0.82rem;
-  letter-spacing: 0.5px;
+  justify-content: center;
+  gap: 12px;
+  min-width: 210px;
+  margin-top: 20px;
+  padding: 12px 18px;
+  color: #fff8e8;
+  background: linear-gradient(135deg, rgba(186, 83, 109, 0.9), rgba(192, 139, 67, 0.82));
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.7px;
   text-decoration: none;
-  transition: color 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 8px 20px rgba(57, 21, 38, 0.28);
+  transition: color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .book-link:hover,
 .book-link:focus-visible {
   color: #fff;
-  transform: translateX(4px);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 26px rgba(57, 21, 38, 0.4);
+}
+
+.book-link:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 4px;
+}
+
+.book-link span {
+  font-size: 1.15rem;
+  line-height: 0.8;
 }
 
 .back-top-btn {
