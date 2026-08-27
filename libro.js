@@ -14,6 +14,9 @@ function isSpread() {
 
 function showPage(pageIndex, direction = 1) {
   const targetPage = Math.max(0, Math.min(pageIndex, pages.length - 1));
+  // Guardamos cuál era la página activa para poder animar su salida.
+  const previousActivePage = pages.find((page) => page.classList.contains('page-active'));
+  const isPageChanging = !previousActivePage || pages.indexOf(previousActivePage) !== targetPage;
   currentPage = targetPage;
   
   // Cerrar el libro si estamos en la portada
@@ -23,7 +26,7 @@ function showPage(pageIndex, direction = 1) {
   
   // Actualizar clases de las páginas
   pages.forEach((page, index) => {
-    page.classList.remove('page-active', 'page-companion', 'page-enter-next', 'page-enter-prev');
+    page.classList.remove('page-active', 'page-companion', 'page-enter-next', 'page-enter-prev', 'page-exit-next', 'page-exit-prev');
     
     if (index === currentPage) {
       page.classList.add('page-active');
@@ -32,6 +35,16 @@ function showPage(pageIndex, direction = 1) {
       page.classList.add('page-companion');
     }
   });
+
+  // Animar la salida de la página anterior (efecto de "voltear" la hoja),
+  // en vez de que desaparezca de golpe.
+  if (isPageChanging && previousActivePage && previousActivePage !== pages[currentPage]) {
+    const exitClass = direction >= 0 ? 'page-exit-next' : 'page-exit-prev';
+    previousActivePage.classList.add(exitClass);
+    previousActivePage.addEventListener('animationend', () => {
+      previousActivePage.classList.remove(exitClass);
+    }, { once: true });
+  }
   
   // Aplicar estilos especiales para última página (solo aplica en modo "spread")
   book.classList.toggle('book-single-end', isSpread() && currentPage === pages.length - 1);
@@ -52,8 +65,8 @@ function goToPreviousPage() {
     book.classList.remove('book-open', 'book-single-end');
     showPage(0, -1);
   } else if (isSpread() && book.classList.contains('book-single-end')) {
-    // Veníamos de la última página mostrada sola: volver a su pareja (n-1, n)
-    showPage(currentPage - 1, -1);
+    // Veníamos de la última página mostrada sola: volver de a 2
+    showPage(currentPage - 2, -1);
   } else if (isSpread()) {
     // Modo de 2 páginas (escritorio): retroceder de a 2
     showPage(currentPage - 2, -1);
