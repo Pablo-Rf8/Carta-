@@ -134,6 +134,8 @@ body.page-ready .page-transition {
   top: 55%;
   width: min(120vw, 900px);
   height: min(120vw, 900px);
+  overflow: hidden;
+  border-radius: 50%;
   transform: translate(-50%, -50%);
   opacity: 0;
   will-change: transform, opacity;
@@ -143,6 +145,9 @@ body.page-ready .page-transition {
   position: absolute;
   inset: 0;
   border-radius: 50%;
+  overflow: hidden;
+  clip-path: circle(50% at 50% 50%);
+  -webkit-clip-path: circle(50% at 50% 50%);
   background: repeating-conic-gradient(
     rgba(255, 221, 160, 0.32) 0deg 3deg,
     transparent 3deg 18deg
@@ -586,6 +591,24 @@ body.page-ready .page-transition {
   }
   .counter-display {
     gap: 4px;
+  }
+}
+
+/* El desenfoque de vidrio (backdrop-filter) es de los efectos más caros de
+   renderizar en un celular, porque el navegador tiene que recalcularlo todo
+   el tiempo mientras la escena de fondo se sigue animando detrás. Bajamos
+   la cantidad de desenfoque en pantallas chicas: se ve casi igual pero
+   cuesta bastante menos. */
+@media (max-width: 640px) {
+  .glass-card {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .glass-card {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 }
 

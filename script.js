@@ -1,4 +1,12 @@
 /* =========================================================
+   0. DETECCIÓN DE DISPOSITIVO: menos elementos animados en
+      celulares y en modo "reducir movimiento", para que no se
+      trabe la animación en equipos con menos potencia.
+   ========================================================= */
+const isMobileViewport = window.matchMedia('(max-width: 640px)').matches;
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* =========================================================
    1. RUTAS DE IMÁGENES LOCALES
    ========================================================= */
 const flowerImages = [
@@ -145,7 +153,11 @@ function generateHeartPoints(count) {
 }
 
 function triggerFlowerBloom() {
-  const totalFlowers = 120;
+  // Menos flores en celular (y todavía menos si el usuario prefiere menos
+  // movimiento en pantalla): son muchos elementos DOM animados a la vez,
+  // y en equipos de gama baja eso es lo que hace que la explosión se sienta
+  // trabada. En escritorio se mantienen las 120 originales.
+  const totalFlowers = prefersReducedMotion ? 30 : (isMobileViewport ? 55 : 120);
   const heartPoints = generateHeartPoints(totalFlowers);
   const baseSize = Math.min(window.innerWidth, window.innerHeight);
   const heartScale = baseSize * 0.42;
@@ -230,19 +242,39 @@ if (canvas) {
     }
   }
 
-  for (let i = 0; i < 25; i++) {
+  for (let i = 0; i < (isMobileViewport ? 12 : 25); i++) {
     const p = new FallingPetal();
     p.y = Math.random() * canvas.height;
     petals.push(p);
   }
 
+  let petalsAnimationId = null;
   function animatePetals() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     petals.forEach(p => {
       p.update();
       p.draw();
     });
-    requestAnimationFrame(animatePetals);
+    petalsAnimationId = requestAnimationFrame(animatePetals);
   }
-  animatePetals();
+
+  // Pausar el canvas cuando la pestaña/app no está visible (al cambiar de
+  // app en el celular o minimizar), así no se sigue gastando batería/CPU
+  // de fondo sin que nadie lo esté viendo.
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      if (petalsAnimationId) cancelAnimationFrame(petalsAnimationId);
+      petalsAnimationId = null;
+    } else if (!petalsAnimationId) {
+      animatePetals();
+    }
+  });
+
+  if (!prefersReducedMotion) {
+    animatePetals();
+  } else {
+    // Con "reducir movimiento" activado, se dibuja un solo cuadro estático
+    // en vez de animar sin parar.
+    petals.forEach(p => p.draw());
+  }
 }

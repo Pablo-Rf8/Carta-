@@ -28,6 +28,10 @@ const mtnFrontSunset = document.getElementById('mtnFrontSunset');
 const mtnFrontNight = document.getElementById('mtnFrontNight');
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// Menos elementos animados en celular: son muchos nodos con su propia
+// animación CSS corriendo a la vez, y en equipos de gama baja eso es lo
+// que hace que el scroll se sienta trabado.
+const isMobileViewport = window.matchMedia('(max-width: 640px)').matches;
 
 function startSectionTypewriter(section) {
   if (section.dataset.textTyped === 'true') return;
@@ -144,7 +148,7 @@ updateLoveCounter();
 /* =========================================================
    4. GENERAR ESTRELLAS (titileo CSS en loop constante)
    ========================================================= */
-const STAR_COUNT = 80;
+const STAR_COUNT = isMobileViewport ? 40 : 80;
 for (let i = 0; i < STAR_COUNT; i++) {
   const star = document.createElement('span');
   star.className = 'star';
@@ -162,7 +166,7 @@ for (let i = 0; i < STAR_COUNT; i++) {
 /* =========================================================
    4.5 GENERAR ESTRELLAS FUGACES ALEATORIAS
    ========================================================= */
-const SHOOTING_STAR_COUNT = 22;
+const SHOOTING_STAR_COUNT = isMobileViewport ? 10 : 22;
 for (let i = 0; i < SHOOTING_STAR_COUNT; i++) {
   const sStar = document.createElement('span');
   sStar.className = 'shooting-star';
@@ -329,6 +333,19 @@ function ambientTick(seconds) {
   });
 }
 gsap.ticker.add(ambientTick);
+
+/* Pausar el ticker de GSAP (el loop ambiental de sol/luna/pájaros) cuando
+   la pestaña o la app no está visible, para no seguir gastando batería/CPU
+   de fondo sin que nadie lo esté viendo. Como ambientTick usa el tiempo
+   acumulado del propio ticker (no el reloj real), al volver no hay ningún
+   salto brusco en la animación. */
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    gsap.ticker.sleep();
+  } else {
+    gsap.ticker.wake();
+  }
+});
 
 requestAnimationFrame(() => {
   document.body.classList.add('page-ready');
