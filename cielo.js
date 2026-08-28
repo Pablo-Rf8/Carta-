@@ -268,8 +268,10 @@ function updateScene(t) {
   const flockWindow = smoothstep(0.3, 0.4, t) * (1 - smoothstep(0.66, 0.76, t));
   const flightProgress = clamp((t - 0.32) / 0.4, 0, 1);
   sceneBase.flightProgress = flightProgress;
-  const flockX = lerp(-18, 118, flightProgress);
+  const flockX = lerp(118, -32, flightProgress);
+  sceneBase.flockX = flockX;
   const flockDrop = flightProgress * 6; // leve descenso al cruzar, como planeando
+  gsap.set(birdEls, { opacity: 1 });
   gsap.set(flockEl, { opacity: flockWindow, x: `${flockX}vw`, y: flockDrop });
 }
 
@@ -316,6 +318,10 @@ function ambientTick(seconds) {
   }
 
   /* los pájaros ondulan en su trayectoria y se inclinan según su velocidad vertical */
+  const flockTravel = 150;
+  const flockX = -32 + ((sceneBase.flockX - 32 - seconds * 8) % flockTravel + flockTravel) % flockTravel;
+  gsap.set(flockEl, { x: `${flockX}vw` });
+
   birdEls.forEach((bird, i) => {
     const bob = Math.sin(seconds * 2.4 + i * 1.1) * 9;
     const tilt = Math.cos(seconds * 2.4 + i * 1.1) * 10;

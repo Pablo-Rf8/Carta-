@@ -194,7 +194,7 @@ body.page-ready .page-transition {
   top: 24%;
   left: 0;
   width: 100%;
-  height: 120px;
+  height: 150px;
   will-change: transform, opacity;
 }
 
@@ -204,7 +204,6 @@ body.page-ready .page-transition {
   left: 0;
   width: 26px;
   height: 26px;
-  opacity: 0;
 }
 
 .bird::before,
@@ -239,6 +238,12 @@ body.page-ready .page-transition {
 .bird--4::before, .bird--4::after { animation-delay: 0.24s; }
 .bird--5 { top: 30px; left: 132px; transform: scale(1); }
 .bird--5::before, .bird--5::after { animation-delay: 0.32s; }
+.bird--6 { top: 58px; left: 172px; transform: scale(0.9); }
+.bird--6::before, .bird--6::after { animation-delay: 0.4s; }
+.bird--7 { top: 18px; left: 214px; transform: scale(1.2); }
+.bird--7::before, .bird--7::after { animation-delay: 0.48s; }
+.bird--8 { top: 72px; left: 258px; transform: scale(0.75); }
+.bird--8::before, .bird--8::after { animation-delay: 0.56s; }
 
 @keyframes flap-left {
   from { transform: rotate(10deg); }
@@ -558,26 +563,9 @@ body.page-ready .page-transition {
   position: relative;
 }
 
-.side-dot span {
-  position: absolute;
-  right: 18px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 0.7rem;
-  color: #fff;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-  white-space: nowrap;
-}
-
 .side-dot.active {
   background: var(--rose);
   transform: scale(1.6);
-}
-
-.side-dot.active span {
-  opacity: 0.9;
 }
 
 @media (prefers-reduced-motion: reduce) {
