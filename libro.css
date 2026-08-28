@@ -148,8 +148,12 @@ body::after {
 .book-ending p { margin-bottom: 0; }
 .eyebrow { color: var(--rose); font-size: .68rem; letter-spacing: 2px; text-transform: uppercase; }
 .cover-symbol { color: var(--gold); font-size: 2rem; margin: 24px 0 8px; }
+.book-cover .eyebrow,
+.book-cover .cover-symbol { transform: translateY(-28px); }
+.book-cover .cover-symbol--bottom { margin: 8px 0 0; transform: translateY(-20px); }
 h1, h2 { font-family: 'Cormorant Garamond', serif; font-weight: 400; margin: 0; }
 h1 { font-size: clamp(3.8rem, 12vw, 6rem); line-height: .78; letter-spacing: 1px; }
+.book-cover h1 { transform: translateY(-52px); }
 h1 em, h2 em { color: var(--rose); font-style: italic; }
 h2 { font-size: clamp(2.25rem, 7vw, 3.8rem); line-height: .95; }
 .book-page p { max-width: 430px; margin: 0 0 11px; color: var(--muted); font-size: .95rem; line-height: 1.5; }

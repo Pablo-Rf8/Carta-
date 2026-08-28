@@ -79,7 +79,7 @@ body.page-leaving .page-transition { opacity: 1; }
 @keyframes temblor { 0%, 50%, 100% { transform: scale(1.03) rotate(0deg); } 25% { transform: scale(1.03) rotate(-1deg); } 75% { transform: scale(1.03) rotate(1deg); } }
 
 .sobre { position: absolute; width: 100%; height: 100%; background: var(--color-sobre-cuerpo); border-radius: 15px; box-shadow: inset 0 0 30px rgba(0,0,0,0.4); }
-.solapa { position: absolute; transform-style: preserve-3d; transition: transform 0.7s cubic-bezier(0.4, 0.0, 0.2, 1); }
+.solapa { position: absolute; transform-style: preserve-3d; backface-visibility: hidden; -webkit-backface-visibility: hidden; transition: transform 0.7s cubic-bezier(0.4, 0.0, 0.2, 1); }
 .solapa-superior { top: 0; left: 0; width: 100%; height: 55%; background: var(--color-sobre-solapa-superior); clip-path: polygon(0 0, 100% 0, 50% 100%); border-radius: 15px 15px 0 0; transform-origin: top; z-index: 6; }
 .solapa-izquierda { top: 0; left: 0; width: 52%; height: 100%; background: var(--color-sobre-solapa); clip-path: polygon(0 0, 100% 50%, 0 100%); border-radius: 15px 0 0 15px; transform-origin: left; z-index: 5; transition-delay: 0.35s; }
 .solapa-derecha { top: 0; right: 0; width: 52%; height: 100%; background: var(--color-sobre-solapa); clip-path: polygon(100% 0, 0 50%, 100% 100%); border-radius: 0 15px 15px 0; transform-origin: right; z-index: 5; transition-delay: 0.35s; }
@@ -109,6 +109,7 @@ body.page-leaving .page-transition { opacity: 1; }
 .envoltura-sobre.abierto .carta {
   animation: abrir-carta var(--duracion-apertura) forwards cubic-bezier(0.18, 0.89, 0.32, 1.28);
   pointer-events: auto;
+  z-index: 30 !important;
 }
 .envoltura-sobre.abierto .solapa-superior { transform: rotateX(180deg); z-index: 0; }
 .envoltura-sobre.abierto .solapa-izquierda { transform: rotateY(180deg); transition-delay: 0.3s; z-index: 0; }
