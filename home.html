@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Un ramo para ti</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Dancing+Script:wght@600;700&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="home.css" />
+</head>
+<body>
+
+  <a class="back-link" href="cielo.html" aria-label="Volver al cielo">← volver al cielo</a>
+
+  <main class="ramo-scene" aria-label="Un ramo de flores animado">
+    <div class="ramo-caption">
+      <span class="ramo-eyebrow">Para ti</span>
+      <h1 class="ramo-title">Un ramo que nunca se marchita</h1>
+    </div>
+
+    <div class="ramo-container" id="ramoContainer">
+
+      <!-- ===================== TALLOS (7, puro CSS) ===================== -->
+      <div class="stem" id="stem-1" data-base-angle="-22" data-len="56"></div>
+      <div class="stem" id="stem-2" data-base-angle="-4"  data-len="66"></div>
+      <div class="stem" id="stem-3" data-base-angle="20"  data-len="55"></div>
+      <div class="stem" id="stem-4" data-base-angle="-10" data-len="42"></div>
+      <div class="stem" id="stem-5" data-base-angle="-32" data-len="46"></div>
+      <div class="stem" id="stem-6" data-base-angle="30"  data-len="44"></div>
+      <div class="stem stem--filler" id="stem-7" data-base-angle="6" data-len="60"></div>
+
+      <!-- ===================== LAZO (puro CSS) ===================== -->
+      <div class="bow" aria-hidden="true">
+        <span class="bow-tail bow-tail-left"></span>
+        <span class="bow-tail bow-tail-right"></span>
+        <span class="bow-loop bow-loop-left"></span>
+        <span class="bow-loop bow-loop-right"></span>
+        <span class="bow-knot"></span>
+      </div>
+
+      <!-- ===================== HOJAS (fondo, 4) ===================== -->
+      <div class="flor-wrap leaf leaf-1">
+        <img class="flor-mover" data-layer="back" src="img/florRamoComplemento3.png" alt="" aria-hidden="true">
+      </div>
+      <div class="flor-wrap leaf leaf-2">
+        <img class="flor-mover" data-layer="back" data-mirror="1" src="img/florRamoComplemento4.png" alt="" aria-hidden="true">
+      </div>
+      <div class="flor-wrap leaf leaf-3">
+        <img class="flor-mover" data-layer="back" src="img/florRamoComplemento5.png" alt="" aria-hidden="true">
+      </div>
+      <div class="flor-wrap leaf leaf-4">
+        <img class="flor-mover" data-layer="back" data-mirror="1" src="img/florRamoComplemento6.png" alt="" aria-hidden="true">
+      </div>
+
+      <!-- ===================== GIRASOLES (medio, 2) ===================== -->
+      <div class="flor-wrap sun sun-1">
+        <img class="flor-mover" data-layer="mid" src="img/florRamoComplemento1.png" alt="" aria-hidden="true">
+      </div>
+      <div class="flor-wrap sun sun-2">
+        <img class="flor-mover" data-layer="mid" data-mirror="1" src="img/florRamoComplemento2.png" alt="" aria-hidden="true">
+      </div>
+
+      <!-- ===================== PEONÍAS (frente, 4) ===================== -->
+      <div class="flor-wrap peony peony-1">
+        <img class="flor-mover" data-layer="front" src="img/florRamo1.png" alt="Peonía rosada" aria-hidden="true">
+      </div>
+      <div class="flor-wrap peony peony-2">
+        <img class="flor-mover" data-layer="front" src="img/florRamo2.png" alt="Peonía rosada" aria-hidden="true">
+      </div>
+      <div class="flor-wrap peony peony-3">
+        <img class="flor-mover" data-layer="front" data-mirror="1" src="img/florRamo3.png" alt="Peonía rosada" aria-hidden="true">
+      </div>
+      <div class="flor-wrap peony peony-4">
+        <img class="flor-mover" data-layer="front" src="img/florRamo4.png" alt="Peonía rosada" aria-hidden="true">
+      </div>
+
+    </div>
+  </main>
+
+  <script src="home.js"></script>
+</body>
+</html>
