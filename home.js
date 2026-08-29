@@ -252,18 +252,27 @@ if (prefersReducedMotion) {
 const widgets = document.querySelectorAll('.widget');
 let highestZ = 40;
 
+// Función para clampar valores
+function clampValue(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
 widgets.forEach(widget => {
   let isDragging = false;
   let startX, startY, initialLeft, initialTop;
 
   const dragStart = (e) => {
-    if(e.target.tagName.toLowerCase() === 'button' || e.target.tagName.toLowerCase() === 'iframe') {
+    // Evitar arrastrar si hizo clic en un botón o iframe
+    if(e.target.tagName.toLowerCase() === 'button' || 
+       e.target.tagName.toLowerCase() === 'iframe' ||
+       e.target.closest('iframe')) {
       return;
     }
 
     isDragging = true;
     highestZ++;
     widget.style.zIndex = highestZ;
+    widget.style.transition = 'none'; // Quitar transiciones durante el drag
     
     const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
     const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
@@ -287,12 +296,27 @@ widgets.forEach(widget => {
     const dx = clientX - startX;
     const dy = clientY - startY;
 
-    widget.style.left = `${initialLeft + dx}px`;
-    widget.style.top = `${initialTop + dy}px`;
+    // Calcular nuevas posiciones con límites
+    let newLeft = initialLeft + dx;
+    let newTop = initialTop + dy;
+
+    // Clampar para mantener dentro de la pantalla (con margen)
+    const minLeft = -100;
+    const maxLeft = window.innerWidth - 100;
+    const minTop = -100;
+    const maxTop = window.innerHeight - 100;
+
+    newLeft = clampValue(newLeft, minLeft, maxLeft);
+    newTop = clampValue(newTop, minTop, maxTop);
+
+    widget.style.left = `${newLeft}px`;
+    widget.style.top = `${newTop}px`;
   };
 
   const dragEnd = () => {
+    if (!isDragging) return;
     isDragging = false;
+    widget.style.transition = 'all 0.3s ease'; // Restaurar transiciones
   };
 
   widget.addEventListener('mousedown', dragStart);

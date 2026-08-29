@@ -448,15 +448,17 @@ body {
   background: linear-gradient(135deg, rgba(255, 20, 80, 0.7), rgba(255, 100, 150, 0.6));
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
-  padding: 12px 18px;
+  padding: 14px 22px;
   border-radius: 14px;
   font-family: inherit;
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   pointer-events: auto;
   box-shadow: 0 4px 12px rgba(255, 20, 80, 0.3);
+  white-space: nowrap;
+  min-width: 140px;
 }
 
 .widget .btn:hover { 
@@ -475,6 +477,7 @@ body {
   border: none;
   font-weight: 700;
   box-shadow: 0 6px 18px rgba(244, 208, 111, 0.4);
+  min-width: 160px;
 }
 
 .widget .btn-magico:hover {
