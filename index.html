@@ -27,14 +27,19 @@
 
   <!-- Música de fondo -->
   <audio id="bg-music" loop preload="auto">
-    <source src="cancion.mp3" type="audio/mp3">
+    <source src="audio/A_Love_Like_Her.mp3" type="audio/mp3">
   </audio>
 
   <!-- Ramo en forma de corazón (Oculto al inicio) -->
   <div id="bloom-stage">
     <div id="bloom-container"></div>
   </div>
-  
+
+  <script>
+  // Selecciona el audio y reduce el volumen a la mitad (0.5)
+  document.getElementById('bg-music').volume = 0.1;
+</script>
+
   <!-- Pétalos cayendo en el fondo -->
   <canvas id="petals-canvas"></canvas>
 
