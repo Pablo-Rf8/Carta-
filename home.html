@@ -23,6 +23,18 @@
 
     <div class="ramo-container" id="ramoContainer">
 
+      <!-- ===================== PASTO/HIERBA (generado por JS, muchas briznas) ===================== -->
+      <div class="grass-field" id="grassField" aria-hidden="true"></div>
+
+      <!-- ===================== MATAS DE HOJAS EN LA BASE (puro CSS, dan volumen verde) ===================== -->
+      <div class="leaf-mound mound-1" aria-hidden="true"></div>
+      <div class="leaf-mound mound-2" aria-hidden="true"></div>
+      <div class="leaf-mound mound-3" aria-hidden="true"></div>
+      <div class="leaf-mound mound-4" aria-hidden="true"></div>
+      <div class="leaf-mound mound-5" aria-hidden="true"></div>
+      <div class="leaf-mound mound-6" aria-hidden="true"></div>
+      <div class="leaf-mound mound-7" aria-hidden="true"></div>
+
       <!-- ===================== TALLOS (7, puro CSS) ===================== -->
       <div class="stem" id="stem-1" data-base-angle="-22" data-len="56"></div>
       <div class="stem" id="stem-2" data-base-angle="-4"  data-len="66"></div>
@@ -31,6 +43,13 @@
       <div class="stem" id="stem-5" data-base-angle="-32" data-len="46"></div>
       <div class="stem" id="stem-6" data-base-angle="30"  data-len="44"></div>
       <div class="stem stem--filler" id="stem-7" data-base-angle="6" data-len="60"></div>
+
+      <!-- ===================== PAPEL QUE ENVUELVE EL RAMO (puro CSS) ===================== -->
+      <div class="paper-wrap" aria-hidden="true">
+        <span class="paper-back"></span>
+        <span class="paper-front"></span>
+        <span class="paper-crease"></span>
+      </div>
 
       <!-- ===================== LAZO (puro CSS) ===================== -->
       <div class="bow" aria-hidden="true">
@@ -41,7 +60,7 @@
         <span class="bow-knot"></span>
       </div>
 
-      <!-- ===================== HOJAS (fondo, 4) ===================== -->
+      <!-- ===================== HOJAS (fondo, 6: las 4 originales + 2 extra para más verde) ===================== -->
       <div class="flor-wrap leaf leaf-1">
         <img class="flor-mover" data-layer="back" src="img/florRamoComplemento3.png" alt="" aria-hidden="true">
       </div>
@@ -54,16 +73,28 @@
       <div class="flor-wrap leaf leaf-4">
         <img class="flor-mover" data-layer="back" data-mirror="1" src="img/florRamoComplemento6.png" alt="" aria-hidden="true">
       </div>
+      <div class="flor-wrap leaf leaf-5">
+        <img class="flor-mover" data-layer="back" data-mirror="1" src="img/florRamoComplemento3.png" alt="" aria-hidden="true">
+      </div>
+      <div class="flor-wrap leaf leaf-6">
+        <img class="flor-mover" data-layer="back" src="img/florRamoComplemento5.png" alt="" aria-hidden="true">
+      </div>
 
-      <!-- ===================== GIRASOLES (medio, 2) ===================== -->
+      <!-- ===================== GIRASOLES (medio, 4: 2 originales + 2 extra chicos) ===================== -->
       <div class="flor-wrap sun sun-1">
         <img class="flor-mover" data-layer="mid" src="img/florRamoComplemento1.png" alt="" aria-hidden="true">
       </div>
       <div class="flor-wrap sun sun-2">
         <img class="flor-mover" data-layer="mid" data-mirror="1" src="img/florRamoComplemento2.png" alt="" aria-hidden="true">
       </div>
+      <div class="flor-wrap sun sun-3">
+        <img class="flor-mover tint-a" data-layer="mid" data-mirror="1" src="img/florRamoComplemento1.png" alt="" aria-hidden="true">
+      </div>
+      <div class="flor-wrap sun sun-4">
+        <img class="flor-mover tint-b" data-layer="mid" src="img/florRamoComplemento2.png" alt="" aria-hidden="true">
+      </div>
 
-      <!-- ===================== PEONÍAS (frente, 4) ===================== -->
+      <!-- ===================== PEONÍAS (frente, 9: 4 principales + 5 chicas de relleno) ===================== -->
       <div class="flor-wrap peony peony-1">
         <img class="flor-mover" data-layer="front" src="img/florRamo1.png" alt="Peonía rosada" aria-hidden="true">
       </div>
@@ -75,6 +106,72 @@
       </div>
       <div class="flor-wrap peony peony-4">
         <img class="flor-mover" data-layer="front" src="img/florRamo4.png" alt="Peonía rosada" aria-hidden="true">
+      </div>
+      <div class="flor-wrap peony peony-5">
+        <img class="flor-mover tint-a" data-layer="mid" data-mirror="1" src="img/florRamo1.png" alt="Peonía rosada" aria-hidden="true">
+      </div>
+      <div class="flor-wrap peony peony-6">
+        <img class="flor-mover tint-b" data-layer="mid" src="img/florRamo2.png" alt="Peonía rosada" aria-hidden="true">
+      </div>
+      <div class="flor-wrap peony peony-7">
+        <img class="flor-mover tint-c" data-layer="mid" data-mirror="1" src="img/florRamo3.png" alt="Peonía rosada" aria-hidden="true">
+      </div>
+      <div class="flor-wrap peony peony-8">
+        <img class="flor-mover tint-a" data-layer="mid" src="img/florRamo4.png" alt="Peonía rosada" aria-hidden="true">
+      </div>
+      <div class="flor-wrap peony peony-9">
+        <img class="flor-mover tint-c" data-layer="front" src="img/florRamo1.png" alt="Peonía rosada" aria-hidden="true">
+      </div>
+      <div class="flor-wrap peony peony-10">
+        <img class="flor-mover tint-b" data-layer="mid" data-mirror="1" src="img/florRamo4.png" alt="Peonía rosada" aria-hidden="true">
+      </div>
+      <div class="flor-wrap peony peony-11">
+        <img class="flor-mover tint-a" data-layer="front" data-mirror="1" src="img/florRamo2.png" alt="Peonía rosada" aria-hidden="true">
+      </div>
+      <div class="flor-wrap peony peony-12">
+        <img class="flor-mover tint-b" data-layer="mid" data-mirror="1" src="img/florRamo3.png" alt="Peonía rosada" aria-hidden="true">
+      </div>
+      <div class="flor-wrap peony peony-13">
+        <img class="flor-mover tint-c" data-layer="mid" src="img/florRamo4.png" alt="Peonía rosada" aria-hidden="true">
+      </div>
+      <div class="flor-wrap peony peony-14">
+        <img class="flor-mover tint-a" data-layer="mid" data-mirror="1" src="img/florRamo2.png" alt="Peonía rosada" aria-hidden="true">
+      </div>
+      <div class="flor-wrap peony peony-15">
+        <img class="flor-mover tint-b" data-layer="mid" src="img/florRamo1.png" alt="Peonía rosada" aria-hidden="true">
+      </div>
+      <div class="flor-wrap peony peony-16">
+        <img class="flor-mover tint-c" data-layer="back" src="img/florRamo3.png" alt="Peonía rosada" aria-hidden="true">
+      </div>
+      <div class="flor-wrap peony peony-17">
+        <img class="flor-mover tint-a" data-layer="front" data-mirror="1" src="img/florRamo4.png" alt="Peonía rosada" aria-hidden="true">
+      </div>
+      <div class="flor-wrap peony peony-18">
+        <img class="flor-mover tint-b" data-layer="front" src="img/florRamo2.png" alt="Peonía rosada" aria-hidden="true">
+      </div>
+      <div class="flor-wrap peony peony-19">
+        <img class="flor-mover tint-a" data-layer="mid" src="img/florRamo1.png" alt="Peonía rosada" aria-hidden="true">
+      </div>
+      <div class="flor-wrap peony peony-20">
+        <img class="flor-mover tint-c" data-layer="mid" data-mirror="1" src="img/florRamo3.png" alt="Peonía rosada" aria-hidden="true">
+      </div>
+      <div class="flor-wrap peony peony-21">
+        <img class="flor-mover tint-b" data-layer="back" src="img/florRamo2.png" alt="Peonía rosada" aria-hidden="true">
+      </div>
+      <div class="flor-wrap peony peony-22">
+        <img class="flor-mover tint-a" data-layer="back" data-mirror="1" src="img/florRamo4.png" alt="Peonía rosada" aria-hidden="true">
+      </div>
+      <div class="flor-wrap sun sun-5">
+        <img class="flor-mover tint-c" data-layer="mid" data-mirror="1" src="img/florRamoComplemento1.png" alt="" aria-hidden="true">
+      </div>
+      <div class="flor-wrap sun sun-6">
+        <img class="flor-mover tint-a" data-layer="mid" src="img/florRamoComplemento2.png" alt="" aria-hidden="true">
+      </div>
+      <div class="flor-wrap sun sun-7">
+        <img class="flor-mover tint-b" data-layer="mid" data-mirror="1" src="img/florRamoComplemento1.png" alt="" aria-hidden="true">
+      </div>
+      <div class="flor-wrap sun sun-8">
+        <img class="flor-mover tint-c" data-layer="mid" src="img/florRamoComplemento2.png" alt="" aria-hidden="true">
       </div>
 
     </div>
