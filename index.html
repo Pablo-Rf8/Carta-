@@ -10,51 +10,54 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Dancing+Script:wght@600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-  <!-- Precarga de las imágenes de flores: se piden ya mismo para que estén
-       listas cuando el usuario toque el sobre, en vez de arrancar la
-       descarga justo en el momento de la animación -->
   <link rel="preload" as="image" href="img/flor1.png">
   <link rel="preload" as="image" href="img/flor2.png">
   <link rel="preload" as="image" href="img/flor3.png">
   <link rel="preload" as="image" href="img/flor4.png">
 
   <link rel="stylesheet" href="style.css" />
+
+  <style>
+    /* Estilo para la ventana mágica que no corta la música */
+    #visor-magico {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      border: none; z-index: 9999; background: transparent;
+      transition: opacity 1s ease;
+    }
+    #visor-magico.hidden { opacity: 0; pointer-events: none; }
+    #visor-magico.active { opacity: 1; pointer-events: auto; }
+  </style>
+
 </head>
 <body>
 
-  <!-- Transición suave entre páginas -->
   <div class="page-transition" aria-hidden="true"></div>
 
-  <!-- Música de fondo -->
+  <!-- MÚSICA DE FONDO -->
   <audio id="bg-music" loop preload="auto">
-    <source src="cancion.mp3" type="audio/mp3">
+    <source src="audio/A_Love_Like_Her.mp3" type="audio/mp3">
   </audio>
 
-  <!-- Ramo en forma de corazón (Oculto al inicio) -->
+  <!-- Ramo en forma de corazón -->
   <div id="bloom-stage">
     <div id="bloom-container"></div>
   </div>
   
-  <!-- Pétalos cayendo en el fondo -->
+  <!-- Pétalos cayendo -->
   <canvas id="petals-canvas"></canvas>
 
-  <!-- CONTENIDO PRINCIPAL: EL SOBRE -->
+  <!-- EL SOBRE -->
   <main class="main-content" id="mainContent">
       <h1 class="hero-title">Para Mi Cielo</h1>
       
       <div class="contenedor">
           <div class="envoltura-sobre" id="sobreInteractuable">
-              
-              <!-- Piezas del sobre -->
               <div class="sobre"></div>
               <div class="solapa solapa-superior"></div>
               <div class="solapa solapa-derecha"></div>
               <div class="solapa solapa-izquierda"></div>
-              
-              <!-- Sello -->
               <div class="sello-css" id="selloCss">♥</div>
 
-              <!-- LA CARTA QUE SALE DEL SOBRE -->
               <div class="carta glass-card" id="cartaInterior">
                   <header class="letter-header">
                     <span class="letter-date">29 de Agosto, 2026</span>
@@ -64,17 +67,57 @@
 
                   <div class="letter-body"><span id="typed-text"></span><span class="cursor" id="cursor"></span></div>
 
+                  <!-- AQUI ESTABA EL ERROR DEL DIV BORRADO -->
                   <div class="next-journey" id="nextJourney">
-                    <a href="cielo.html" class="journey-btn" id="journeyBtn">
-                      por qué eres mi cielo?
+                    <a href="#" class="journey-btn" id="journeyBtn" onclick="abrirRamo(event)">
+                      eres mi cielo
                     </a>
                   </div>
-              </div>
 
+              </div>
           </div>
       </div>
   </main>
 
+  <!-- LA VENTANA MÁGICA (Solo debe haber una) -->
+  <iframe id="visor-magico" class="hidden" src="" allow="autoplay"></iframe>
+
   <script src="script.js"></script>
+
+  <!-- SCRIPT MÁGICO PARA MÚSICA Y TRANSICIÓN -->
+  <script>
+    // Truco para que la música empiece en cuanto ella toque el sobre o la pantalla
+    document.body.addEventListener('click', function startAudio() {
+      const musica = document.getElementById('bg-music');
+      if (musica && musica.paused) {
+        musica.play().catch(e => console.log("Esperando interacción..."));
+      }
+      document.body.removeEventListener('click', startAudio);
+    }, { once: true });
+
+    // Función a prueba de fallos para cargar el ramo
+    function abrirRamo(event) {
+      event.preventDefault(); // Evita que la página salte
+      
+      // 1. Ocultamos el sobre y las flores de fondo suavemente
+      const mainContent = document.getElementById('mainContent');
+      const bloomStage = document.getElementById('bloom-stage');
+      const petals = document.getElementById('petals-canvas');
+      
+      if (mainContent) { mainContent.style.transition = 'opacity 1s ease'; mainContent.style.opacity = '0'; }
+      if (bloomStage) { bloomStage.style.transition = 'opacity 1s ease'; bloomStage.style.opacity = '0'; }
+      if (petals) { petals.style.transition = 'opacity 1s ease'; petals.style.opacity = '0'; }
+
+      // 2. Esperamos 1 segundo a que se desvanezca y mostramos la ventana mágica con home.html
+      setTimeout(() => {
+        const visor = document.getElementById('visor-magico');
+        if (visor) {
+          visor.src = 'home.html'; // Cargamos el Ramo
+          visor.classList.remove('hidden');
+          visor.classList.add('active');
+        }
+      }, 1000);
+    }
+  </script>
 </body>
 </html>

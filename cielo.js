@@ -356,3 +356,12 @@ window.addEventListener('resize', () => {
   ScrollTrigger.refresh();
   updateScene(sceneState.progress);
 });
+
+// Asegurarnos de que la música principal vuelva a sonar si regresó desde el libro
+  if (window.parent && window.parent.document.getElementById('bg-music')) {
+    const musicaPrincipal = window.parent.document.getElementById('bg-music');
+    // Si la música principal estaba pausada (porque vino del libro), le damos play de nuevo
+    if (musicaPrincipal.paused) {
+      musicaPrincipal.play().catch(() => {});
+    }
+  }
