@@ -249,15 +249,20 @@ if (prefersReducedMotion) {
 /* ==========================================
    LÓGICA PARA ARRASTRAR WIDGETS (Drag & Drop)
    ========================================== */
-const widgets = document.querySelectorAll('.widget');
-let highestZ = 40;
 
-// Función para clampar valores
-function clampValue(value, min, max) {
-  return Math.max(min, Math.min(max, value));
+let highestZ = 1001;
+
+// Función para convertir % a píxeles
+function percentToPixels(percent, dimension) {
+  const value = parseFloat(percent);
+  if (percent.includes('%')) {
+    return (value / 100) * dimension;
+  }
+  return value;
 }
 
-widgets.forEach(widget => {
+const widgetElements = document.querySelectorAll('.widget');
+widgetElements.forEach(widget => {
   let isDragging = false;
   let startX, startY, initialLeft, initialTop;
 
@@ -272,7 +277,7 @@ widgets.forEach(widget => {
     isDragging = true;
     highestZ++;
     widget.style.zIndex = highestZ;
-    widget.style.transition = 'none'; // Quitar transiciones durante el drag
+    widget.style.transition = 'none';
     
     const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
     const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
@@ -280,8 +285,12 @@ widgets.forEach(widget => {
     startX = clientX;
     startY = clientY;
     
-    initialLeft = widget.offsetLeft;
-    initialTop = widget.offsetTop;
+    // Convertir estilos actuales (que pueden ser % o px) a píxeles
+    const topStr = widget.style.top || '0';
+    const leftStr = widget.style.left || '0';
+    
+    initialTop = percentToPixels(topStr, window.innerHeight);
+    initialLeft = percentToPixels(leftStr, window.innerWidth);
     
     widget.style.animation = 'none';
   };
@@ -296,18 +305,8 @@ widgets.forEach(widget => {
     const dx = clientX - startX;
     const dy = clientY - startY;
 
-    // Calcular nuevas posiciones con límites
-    let newLeft = initialLeft + dx;
-    let newTop = initialTop + dy;
-
-    // Clampar para mantener dentro de la pantalla (con margen)
-    const minLeft = -100;
-    const maxLeft = window.innerWidth - 100;
-    const minTop = -100;
-    const maxTop = window.innerHeight - 100;
-
-    newLeft = clampValue(newLeft, minLeft, maxLeft);
-    newTop = clampValue(newTop, minTop, maxTop);
+    const newLeft = initialLeft + dx;
+    const newTop = initialTop + dy;
 
     widget.style.left = `${newLeft}px`;
     widget.style.top = `${newTop}px`;
@@ -316,7 +315,7 @@ widgets.forEach(widget => {
   const dragEnd = () => {
     if (!isDragging) return;
     isDragging = false;
-    widget.style.transition = 'all 0.3s ease'; // Restaurar transiciones
+    widget.style.transition = 'all 0.3s ease';
   };
 
   widget.addEventListener('mousedown', dragStart);
@@ -418,18 +417,27 @@ if (btnDownload) {
   });
 }
 
-// Botón Mi Cielo Hermoso
-const btnCielo = document.getElementById('btn-cielo-widget');
-if (btnCielo) {
-  btnCielo.addEventListener('click', () => {
-    window.location.href = 'cielo.html';
-  });
-}
+// Botón para ir al Cielo
+  const btnCielo = document.getElementById('btn-cielo');
+  if(btnCielo) {
+    btnCielo.addEventListener('click', () => {
+      window.location.href = 'cielo.html';
+    });
+  }
 
-// Botón Nuestro Libro
-const btnLibro = document.getElementById('btn-libro-widget');
-if (btnLibro) {
-  btnLibro.addEventListener('click', () => {
-    window.location.href = 'libro.html';
-  });
-}
+  // Botón para ir al Libro
+  const btnLibro = document.getElementById('btn-libro');
+  if(btnLibro) {
+    btnLibro.addEventListener('click', () => {
+      window.location.href = 'libro.html';
+    });
+
+    // Asegurarnos de que la música principal vuelva a sonar si regresó desde el libro
+  if (window.parent && window.parent.document.getElementById('bg-music')) {
+    const musicaPrincipal = window.parent.document.getElementById('bg-music');
+    // Si la música principal estaba pausada (porque vino del libro), le damos play de nuevo
+    if (musicaPrincipal.paused) {
+      musicaPrincipal.play().catch(() => {});
+    }
+  }
+  }

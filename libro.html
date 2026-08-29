@@ -244,6 +244,27 @@
     </div>
   </main>
 
-  <script src="libro.js"></script>
+  <script src="libr   o.js"></script>
 </body>
+<!-- Música exclusiva para el libro -->
+  <audio id="musica-libro" loop>
+    <source src="audio/cancion-del-libro.mp3" type="audio/mp3">
+  </audio>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Buscamos la música principal que está sonando en el index.html y la PAUSAMOS
+      if (window.parent && window.parent.document.getElementById('bg-music')) {
+        window.parent.document.getElementById('bg-music').pause();
+      }
+
+      // 2. Le damos PLAY automáticamente a la música de este libro
+      const musicaLibro = document.getElementById('musica-libro');
+      if (musicaLibro) {
+        musicaLibro.play().catch(() => {
+          console.log("El navegador pide que el usuario interactúe primero");
+        });
+      }
+    });
+  </script>
 </html>

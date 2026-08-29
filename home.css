@@ -54,8 +54,13 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  overflow: hidden;
+  overflow: visible;
   padding: clamp(16px, 5vh, 48px) 0 clamp(24px, 6vh, 56px);
+  pointer-events: none;
+}
+
+.ramo-scene > * {
+  pointer-events: auto;
 }
 
 .ramo-caption {
@@ -403,8 +408,15 @@ body {
 /* =========================================================
    WIDGETS ARRASTRABLES (Efecto Cristal Mejorado)
    ========================================================= */
+#widgets-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1000;
+}
+
 .widget {
-  position: absolute;
+  position: fixed;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -412,11 +424,12 @@ body {
   border-radius: 20px;
   padding: 14px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 2px 8px rgba(255, 255, 255, 0.1);
-  z-index: 35;
+  z-index: 1001;
   cursor: grab;
   opacity: 0;
   animation: popInWidget 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   transition: all 0.3s ease;
+  pointer-events: auto;
 }
 
 .widget:hover {
