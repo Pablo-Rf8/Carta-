@@ -19,6 +19,30 @@
   <link rel="preload" as="image" href="img/flor4.png">
 
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Estilos para la ventana mágica y el control de volumen -->
+  <style>
+    /* Estilo para la ventana mágica que no corta la música */
+    #visor-magico {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      border: none; z-index: 9999; background: transparent;
+      transition: opacity 1s ease;
+    }
+    #visor-magico.hidden { opacity: 0; pointer-events: none; }
+    #visor-magico.active { opacity: 1; pointer-events: auto; }
+
+    /* Estilo del Control de Volumen Global */
+    .volume-container {
+      position: fixed; bottom: 20px; right: 20px; z-index: 10000;
+      background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 25px; padding: 8px 15px;
+      display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    .volume-container span { color: white; font-size: 1rem; }
+#global-volume { -webkit-appearance: none; appearance: none; width: 80px; height: 4px; background: rgba(255,255,255,0.3); border-radius: 2px; outline: none; }
+    #global-volume::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #ff9ebb; cursor: pointer; box-shadow: 0 0 5px rgba(0,0,0,0.5); }
+  </style>
+
 </head>
 <body>
 
@@ -30,16 +54,18 @@
     <source src="audio/A_Love_Like_Her.mp3" type="audio/mp3">
   </audio>
 
+  <!-- CONTROL DE VOLUMEN GLOBAL -->
+  <div id="volume-container" class="volume-container">
+    <span>🔈</span>
+    <input type="range" id="global-volume" min="0" max="1" step="0.01" value="0.3">
+    <span>🔊</span>
+  </div>
+
   <!-- Ramo en forma de corazón (Oculto al inicio) -->
   <div id="bloom-stage">
     <div id="bloom-container"></div>
   </div>
-
-  <script>
-  // Selecciona el audio y reduce el volumen a la mitad (0.5)
-  document.getElementById('bg-music').volume = 0.1;
-</script>
-
+  
   <!-- Pétalos cayendo en el fondo -->
   <canvas id="petals-canvas"></canvas>
 
@@ -70,7 +96,7 @@
                   <div class="letter-body"><span id="typed-text"></span><span class="cursor" id="cursor"></span></div>
 
                   <div class="next-journey" id="nextJourney">
-                    <a href="home.html" class="journey-btn" id="journeyBtn">
+                    <a href="#" class="journey-btn" id="journeyBtn" onclick="abrirRamo(event)">
                       Mi regalo <3
                     </a>
                   </div>
@@ -80,6 +106,70 @@
       </div>
   </main>
 
+  <!-- LA VENTANA MÁGICA DONDE VIVIRÁ EL RAMO Y EL LIBRO -->
+  <iframe id="visor-magico" class="hidden" src="" allow="autoplay"></iframe>
+
   <script src="script.js"></script>
+
+  <!-- SCRIPT MÁGICO PARA MÚSICA, TRANSICIÓN Y VOLUMEN -->
+  <script>
+    // 1. Truco para que la música empiece en cuanto ella toque el sobre
+    document.body.addEventListener('click', function startAudio() {
+      const musica = document.getElementById('bg-music');
+      const volSlider = document.getElementById('global-volume');
+      if (musica && musica.paused) {
+        musica.volume = volSlider.value; // Toma el valor del slider (0.3)
+        musica.play().catch(e => console.log("Esperando interacción..."));
+      }
+      document.body.removeEventListener('click', startAudio);
+    }, { once: true });
+
+    // 2. Función a prueba de fallos para cargar el ramo en la ventana mágica
+    function abrirRamo(event) {
+      event.preventDefault(); // Evita que la página salte o se cierre
+      
+      // Ocultamos el sobre y las flores de fondo suavemente
+      const mainContent = document.getElementById('mainContent');
+      const bloomStage = document.getElementById('bloom-stage');
+      const petals = document.getElementById('petals-canvas');
+      
+      if (mainContent) { mainContent.style.transition = 'opacity 1s ease'; mainContent.style.opacity = '0'; }
+      if (bloomStage) { bloomStage.style.transition = 'opacity 1s ease'; bloomStage.style.opacity = '0'; }
+      if (petals) { petals.style.transition = 'opacity 1s ease'; petals.style.opacity = '0'; }
+
+      // Esperamos 1 segundo a que se desvanezca y mostramos la ventana mágica con home.html
+      setTimeout(() => {
+        const visor = document.getElementById('visor-magico');
+        if (visor) {
+          visor.src = 'home.html'; 
+          visor.classList.remove('hidden');
+          visor.classList.add('active');
+        }
+      }, 1000);
+    }
+
+    // 3. LÓGICA DEL CONTROL DE VOLUMEN GLOBAL
+    const volSlider = document.getElementById('global-volume');
+    const musicaPrincipal = document.getElementById('bg-music');
+    
+    // Aseguramos que la música inicie con el nivel del slider (30%)
+    if(musicaPrincipal) musicaPrincipal.volume = volSlider.value;
+
+    volSlider.addEventListener('input', (e) => {
+      const nuevoVolumen = e.target.value;
+      
+      // Cambia el volumen de la música principal
+      if(musicaPrincipal) musicaPrincipal.volume = nuevoVolumen;
+      
+      // Cambia el volumen si está en el libro
+      try {
+        const visor = document.getElementById('visor-magico');
+        if (visor && visor.contentWindow) {
+          const musicaLibro = visor.contentWindow.document.getElementById('musica-libro');
+          if (musicaLibro) musicaLibro.volume = nuevoVolumen;
+        }
+      } catch(err) {}
+    });
+  </script>
 </body>
 </html>
