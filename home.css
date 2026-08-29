@@ -54,8 +54,13 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  overflow: hidden;
+  overflow: visible;
   padding: clamp(16px, 5vh, 48px) 0 clamp(24px, 6vh, 56px);
+  pointer-events: none;
+}
+
+.ramo-scene > * {
+  pointer-events: auto;
 }
 
 .ramo-caption {
@@ -180,9 +185,7 @@ body {
 .bow-tail-right { left: 68%; transform: translateX(-50%) rotate(14deg); }
 
 /* =========================================================
-   PAPEL: dos láminas superpuestas (una más oscura detrás, girada
-   al otro lado) que convergen en el punto del lazo, simulando el
-   papel kraft/cascada que envuelve la base de un ramo real.
+   PAPEL: Convertido a SVG para compatibilidad con html2canvas
    ========================================================= */
 .paper-wrap {
   position: absolute;
@@ -194,23 +197,22 @@ body {
   z-index: 2;
   pointer-events: none;
 }
-.paper-back {
+.paper-svg {
   position: absolute;
   inset: 0;
-  clip-path: polygon(4% 16%, 40% 0%, 60% 9%, 96% 18%, 50% 100%);
-  background: linear-gradient(150deg, #f3d9ae 0%, #d9a468 60%, #b9793f 100%);
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.paper-back {
   transform-origin: 50% 100%;
   transform: rotate(-4deg);
-  box-shadow: 0 14px 26px rgba(50, 25, 10, 0.3);
+  filter: drop-shadow(0 14px 10px rgba(50, 25, 10, 0.3));
 }
 .paper-front {
-  position: absolute;
-  inset: 0;
-  clip-path: polygon(9% 12%, 38% 24%, 50% 3%, 64% 21%, 91% 9%, 50% 100%);
-  background: linear-gradient(160deg, #fffaf2 0%, #f6dfb8 55%, #e3b47f 100%);
   transform-origin: 50% 100%;
   transform: rotate(3deg);
-  box-shadow: 0 10px 22px rgba(50, 25, 10, 0.22);
+  filter: drop-shadow(0 10px 10px rgba(50, 25, 10, 0.22));
 }
 .paper-crease {
   position: absolute;
@@ -406,8 +408,15 @@ body {
 /* =========================================================
    WIDGETS ARRASTRABLES (Efecto Cristal Mejorado)
    ========================================================= */
+#widgets-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1000;
+}
+
 .widget {
-  position: absolute;
+  position: fixed;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -415,11 +424,12 @@ body {
   border-radius: 20px;
   padding: 14px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 2px 8px rgba(255, 255, 255, 0.1);
-  z-index: 35;
+  z-index: 1001;
   cursor: grab;
   opacity: 0;
   animation: popInWidget 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   transition: all 0.3s ease;
+  pointer-events: auto;
 }
 
 .widget:hover {
@@ -500,4 +510,68 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .flor-mover, .stem { transition: none; }
+}
+
+@media (max-width: 480px) {
+  .ramo-scene {
+    padding-top: 8vh; 
+  }
+  .ramo-container {
+    width: 95vw; 
+    height: 65vh; 
+    min-height: 380px;
+  }
+  .ramo-title {
+    font-size: 1.7rem;
+  }
+  .widget {
+    padding: 10px;
+    border-radius: 16px;
+  }
+  .widget .btn, .widget .btn-magico {
+    min-width: 120px;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+  }
+  .back-link {
+    top: 12px;
+    left: 12px;
+    font-size: 0.75rem;
+  }
+}
+
+/* =========================================================
+   ETIQUETA (Dedicatoria)
+   ========================================================= */
+.ramo-tag {
+  position: absolute;
+  left: 58%;
+  bottom: 8%;
+  background: #fffaf2;
+  color: var(--rose-deep);
+  padding: 6px 14px 6px 22px;
+  border-radius: 3px;
+  font-family: 'Dancing Script', cursive;
+  font-size: clamp(1.2rem, 3.5vw, 1.5rem);
+  font-weight: 700;
+  box-shadow: 2px 6px 14px rgba(20, 5, 15, 0.4);
+  transform-origin: top left;
+  transform: rotate(12deg);
+  z-index: 10;
+  pointer-events: none;
+  border: 1px solid rgba(192, 139, 67, 0.4);
+}
+
+/* Agujerito de la etiqueta */
+.ramo-tag::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  background: var(--bg-deep); /* Simula transparencia al color del fondo */
+  border-radius: 50%;
+  box-shadow: inset 1px 1px 3px rgba(0,0,0,0.6);
 }

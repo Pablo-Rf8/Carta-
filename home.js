@@ -249,21 +249,27 @@ if (prefersReducedMotion) {
 /* ==========================================
    LÓGICA PARA ARRASTRAR WIDGETS (Drag & Drop)
    ========================================== */
-const widgets = document.querySelectorAll('.widget');
-let highestZ = 40;
 
-// Función para clampar valores
-function clampValue(value, min, max) {
-  return Math.max(min, Math.min(max, value));
+let highestZ = 1001;
+
+// Función para convertir % a píxeles
+function percentToPixels(percent, dimension) {
+  const value = parseFloat(percent);
+  if (percent.includes('%')) {
+    return (value / 100) * dimension;
+  }
+  return value;
 }
 
-widgets.forEach(widget => {
+const widgetElements = document.querySelectorAll('.widget');
+widgetElements.forEach(widget => {
   let isDragging = false;
   let startX, startY, initialLeft, initialTop;
 
-  const dragStart = (e) => {
-    // Evitar arrastrar si hizo clic en un botón o iframe
+ const dragStart = (e) => {
+    // Evitar arrastrar si hizo clic en un botón, enlace o iframe
     if(e.target.tagName.toLowerCase() === 'button' || 
+       e.target.tagName.toLowerCase() === 'a' ||
        e.target.tagName.toLowerCase() === 'iframe' ||
        e.target.closest('iframe')) {
       return;
@@ -272,7 +278,7 @@ widgets.forEach(widget => {
     isDragging = true;
     highestZ++;
     widget.style.zIndex = highestZ;
-    widget.style.transition = 'none'; // Quitar transiciones durante el drag
+    widget.style.transition = 'none';
     
     const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
     const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
@@ -280,9 +286,16 @@ widgets.forEach(widget => {
     startX = clientX;
     startY = clientY;
     
-    initialLeft = widget.offsetLeft;
-    initialTop = widget.offsetTop;
+    // Convertir estilos actuales (que pueden ser % o px) a píxeles
+    const topStr = widget.style.top || '0';
+    const leftStr = widget.style.left || '0';
     
+    initialTop = percentToPixels(topStr, window.innerHeight);
+    initialLeft = percentToPixels(leftStr, window.innerWidth);
+    
+    // FIJAR VISIBILIDAD ANTES DE ELIMINAR LA ANIMACIÓN
+    widget.style.opacity = '1';
+    widget.style.transform = 'scale(1) rotate(0deg)';
     widget.style.animation = 'none';
   };
 
@@ -296,18 +309,8 @@ widgets.forEach(widget => {
     const dx = clientX - startX;
     const dy = clientY - startY;
 
-    // Calcular nuevas posiciones con límites
-    let newLeft = initialLeft + dx;
-    let newTop = initialTop + dy;
-
-    // Clampar para mantener dentro de la pantalla (con margen)
-    const minLeft = -100;
-    const maxLeft = window.innerWidth - 100;
-    const minTop = -100;
-    const maxTop = window.innerHeight - 100;
-
-    newLeft = clampValue(newLeft, minLeft, maxLeft);
-    newTop = clampValue(newTop, minTop, maxTop);
+    const newLeft = initialLeft + dx;
+    const newTop = initialTop + dy;
 
     widget.style.left = `${newLeft}px`;
     widget.style.top = `${newTop}px`;
@@ -316,7 +319,7 @@ widgets.forEach(widget => {
   const dragEnd = () => {
     if (!isDragging) return;
     isDragging = false;
-    widget.style.transition = 'all 0.3s ease'; // Restaurar transiciones
+    widget.style.transition = 'all 0.3s ease';
   };
 
   widget.addEventListener('mousedown', dragStart);
@@ -360,20 +363,44 @@ const btnDownload = document.getElementById('btn-download-widget');
 if (btnDownload) {
   btnDownload.addEventListener('click', async () => {
     try {
-      // Usar html2canvas si está disponible, sino usar captura nativa
       if (typeof html2canvas !== 'undefined') {
-        const canvas = await html2canvas(document.querySelector('.ramo-scene'), {
-          backgroundColor: null,
-          scale: 2
+        // 1. Seleccionar los elementos de la interfaz a ocultar
+        const uiElements = document.querySelectorAll('.widget, .back-link');
+        
+        // 2. Ocultarlos temporalmente desactivando transiciones para que sea instantáneo
+        uiElements.forEach(el => {
+          el.style.transition = 'none';
+          el.style.opacity = '0';
         });
+
+        // Pausa ultracorta para asegurar que el navegador aplique la invisibilidad
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        // Evitar cortes en la imagen subiendo el scroll
+        window.scrollTo(0, 0);
+
+        // 3. Capturar el body completo para incluir el fondo
+        const canvas = await html2canvas(document.body, {
+          backgroundColor: '#160c18', 
+          scale: 2, // Alta resolución
+          useCORS: true
+        });
+
+        // 4. Restaurar la visibilidad de la interfaz
+        uiElements.forEach(el => {
+          el.style.transition = ''; 
+          el.style.opacity = '1';
+        });
+
+        // 5. Descargar la imagen
         const link = document.createElement('a');
-        link.href = canvas.toDataURL();
-        link.download = 'mi-ramo-hermoso.png';
+        link.href = canvas.toDataURL('image/png');
+        link.download = 'Mi_Ramo_Eterno.png';
         link.click();
+        
         btnDownload.textContent = '✅ Guardado';
         setTimeout(() => { btnDownload.textContent = '📸 Guardar Foto'; }, 2000);
       } else {
-        // Fallback: usar screenshot API si está disponible
         if (navigator.screenshot) {
           const canvas = await navigator.screenshot.captureScreen();
           const link = document.createElement('a');
@@ -386,22 +413,35 @@ if (btnDownload) {
       }
     } catch (error) {
       console.error('Error al capturar pantalla:', error);
+      // Asegurar que la interfaz reaparezca si ocurre un error
+      document.querySelectorAll('.widget, .back-link, .ramo-caption').forEach(el => {
+        el.style.opacity = '1';
+      });
     }
   });
 }
 
-// Botón Mi Cielo Hermoso
-const btnCielo = document.getElementById('btn-cielo-widget');
-if (btnCielo) {
-  btnCielo.addEventListener('click', () => {
-    window.location.href = 'cielo.html';
-  });
-}
+// Botón para ir al Cielo
+  const btnCielo = document.getElementById('btn-cielo');
+  if(btnCielo) {
+    btnCielo.addEventListener('click', () => {
+      window.location.href = 'cielo.html';
+    });
+  }
 
-// Botón Nuestro Libro
-const btnLibro = document.getElementById('btn-libro-widget');
-if (btnLibro) {
-  btnLibro.addEventListener('click', () => {
-    window.location.href = 'libro.html';
-  });
-}
+  // Botón para ir al Libro
+  const btnLibro = document.getElementById('btn-libro');
+  if(btnLibro) {
+    btnLibro.addEventListener('click', () => {
+      window.location.href = 'libro.html';
+    });
+
+    // Asegurarnos de que la música principal vuelva a sonar si regresó desde el libro
+  if (window.parent && window.parent.document.getElementById('bg-music')) {
+    const musicaPrincipal = window.parent.document.getElementById('bg-music');
+    // Si la música principal estaba pausada (porque vino del libro), le damos play de nuevo
+    if (musicaPrincipal.paused) {
+      musicaPrincipal.play().catch(() => {});
+    }
+  }
+  }
