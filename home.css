@@ -343,16 +343,156 @@ body {
 .mound-6 { left: 78%;  width: 30%; aspect-ratio: 1 / 0.62; border-radius: 45% 55% 48% 52% / 55% 48% 52% 45%; bottom: -12%; }
 .mound-7 { right: -6%; width: 26%; aspect-ratio: 1 / 0.68; border-radius: 52% 48% 58% 42% / 48% 52% 45% 55%; bottom: -9%; }
 
+
 /* =========================================================
-   RESPONSIVE: en celular baja un poco el volumen relativo para
-   que no se corten las flores de los bordes, pero el ramo sigue
-   siendo lo más grande de la pantalla.
+   TARJETA EN MEDIO DEL RAMO
+   ========================================================= */
+.tarjeta-ramo {
+  display: none;
+}
+
+.tarjeta-titulo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.2rem, 4vw, 1.8rem);
+  color: var(--rose-deep);
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.spotify-box {
+  margin: 16px 0;
+}
+
+.spotify-box iframe {
+  max-width: 100%;
+  border-radius: 12px !important;
+}
+
+.botones-carta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(0.85rem, 2vw, 1rem);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(217, 92, 134, 0.3);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(217, 92, 134, 0.5);
+}
+
+.btn-magico {
+  background: linear-gradient(135deg, var(--gold), #f4c26f);
+  color: #000;
+}
+
+.btn-magico:hover {
+  background: linear-gradient(135deg, #f4d06f, var(--gold));
+}
+
+/* =========================================================
+   WIDGETS ARRASTRABLES (Efecto Cristal Mejorado)
+   ========================================================= */
+.widget {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-radius: 20px;
+  padding: 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 2px 8px rgba(255, 255, 255, 0.1);
+  z-index: 35;
+  cursor: grab;
+  opacity: 0;
+  animation: popInWidget 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  transition: all 0.3s ease;
+}
+
+.widget:hover {
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), inset 0 2px 8px rgba(255, 255, 255, 0.15);
+  transform: translateY(-4px);
+}
+
+.widget:active {
+  cursor: grabbing;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+#widget-spotify { animation-delay: 1.8s; }
+#widget-play { animation-delay: 2.0s; }
+#widget-cielo { animation-delay: 2.2s; }
+#widget-download { animation-delay: 2.4s; }
+#widget-libro { animation-delay: 2.6s; }
+
+@keyframes popInWidget {
+  0% { opacity: 0; transform: scale(0.6) rotate(-5deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+.widget .btn {
+  background: linear-gradient(135deg, rgba(255, 20, 80, 0.7), rgba(255, 100, 150, 0.6));
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 12px 18px;
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  pointer-events: auto;
+  box-shadow: 0 4px 12px rgba(255, 20, 80, 0.3);
+}
+
+.widget .btn:hover { 
+  background: linear-gradient(135deg, rgba(255, 40, 100, 0.9), rgba(255, 120, 170, 0.9));
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 20, 80, 0.5);
+}
+
+.widget .btn:active {
+  transform: translateY(0);
+}
+
+.widget .btn-magico {
+  background: linear-gradient(135deg, var(--gold), #f4c26f);
+  color: #2a1a00;
+  border: none;
+  font-weight: 700;
+  box-shadow: 0 6px 18px rgba(244, 208, 111, 0.4);
+}
+
+.widget .btn-magico:hover {
+  background: linear-gradient(135deg, #ffd700, var(--gold));
+  box-shadow: 0 8px 24px rgba(244, 208, 111, 0.6);
+}
+
+/* =========================================================
+   RESPONSIVE TARJETA
    ========================================================= */
 @media (max-width: 560px) {
-  .ramo-container { width: min(96vw, 600px); height: min(66vh, 620px); }
-  .leaf-1 { left: -8%; width: 56%; }
-  .leaf-2 { right: -10%; width: 58%; }
-  .ramo-title { font-size: clamp(1.3rem, 6vw, 1.8rem); }
+  .tarjeta-ramo { 
+    width: 85vw;
+    padding: 20px;
+  }
+  .botones-carta {
+    gap: 8px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

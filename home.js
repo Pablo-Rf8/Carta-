@@ -245,3 +245,139 @@ if (prefersReducedMotion) {
 } else {
   startLoop();
 }
+
+/* ==========================================
+   LÓGICA PARA ARRASTRAR WIDGETS (Drag & Drop)
+   ========================================== */
+const widgets = document.querySelectorAll('.widget');
+let highestZ = 40;
+
+widgets.forEach(widget => {
+  let isDragging = false;
+  let startX, startY, initialLeft, initialTop;
+
+  const dragStart = (e) => {
+    if(e.target.tagName.toLowerCase() === 'button' || e.target.tagName.toLowerCase() === 'iframe') {
+      return;
+    }
+
+    isDragging = true;
+    highestZ++;
+    widget.style.zIndex = highestZ;
+    
+    const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+    const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+
+    startX = clientX;
+    startY = clientY;
+    
+    initialLeft = widget.offsetLeft;
+    initialTop = widget.offsetTop;
+    
+    widget.style.animation = 'none';
+  };
+
+  const drag = (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+
+    const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+    const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+
+    const dx = clientX - startX;
+    const dy = clientY - startY;
+
+    widget.style.left = `${initialLeft + dx}px`;
+    widget.style.top = `${initialTop + dy}px`;
+  };
+
+  const dragEnd = () => {
+    isDragging = false;
+  };
+
+  widget.addEventListener('mousedown', dragStart);
+  document.addEventListener('mousemove', drag);
+  document.addEventListener('mouseup', dragEnd);
+
+  widget.addEventListener('touchstart', dragStart, { passive: false });
+  document.addEventListener('touchmove', drag, { passive: false });
+  document.addEventListener('touchend', dragEnd);
+});
+
+/* ==========================================
+   FUNCIONES DE LOS BOTONES
+   ========================================== */
+
+// Estado de la música
+let isPlaying = false;
+const bgMusic = document.getElementById('bg-music');
+
+// Botón Play Canción
+const btnPlay = document.getElementById('btn-play-widget');
+if (btnPlay) {
+  btnPlay.addEventListener('click', () => {
+    if (bgMusic) {
+      if (isPlaying) {
+        bgMusic.pause();
+        btnPlay.textContent = '🎵 Play Fondo';
+        btnPlay.style.opacity = '0.7';
+      } else {
+        bgMusic.play();
+        btnPlay.textContent = '⏸ Pausar';
+        btnPlay.style.opacity = '1';
+      }
+      isPlaying = !isPlaying;
+    }
+  });
+}
+
+// Botón Guardar Foto del Ramo
+const btnDownload = document.getElementById('btn-download-widget');
+if (btnDownload) {
+  btnDownload.addEventListener('click', async () => {
+    try {
+      // Usar html2canvas si está disponible, sino usar captura nativa
+      if (typeof html2canvas !== 'undefined') {
+        const canvas = await html2canvas(document.querySelector('.ramo-scene'), {
+          backgroundColor: null,
+          scale: 2
+        });
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL();
+        link.download = 'mi-ramo-hermoso.png';
+        link.click();
+        btnDownload.textContent = '✅ Guardado';
+        setTimeout(() => { btnDownload.textContent = '📸 Guardar Foto'; }, 2000);
+      } else {
+        // Fallback: usar screenshot API si está disponible
+        if (navigator.screenshot) {
+          const canvas = await navigator.screenshot.captureScreen();
+          const link = document.createElement('a');
+          link.href = canvas.toDataURL();
+          link.download = 'mi-ramo-hermoso.png';
+          link.click();
+        } else {
+          alert('Intenta hacer una captura con tu teclado o usa la opción del sistema.');
+        }
+      }
+    } catch (error) {
+      console.error('Error al capturar pantalla:', error);
+    }
+  });
+}
+
+// Botón Mi Cielo Hermoso
+const btnCielo = document.getElementById('btn-cielo-widget');
+if (btnCielo) {
+  btnCielo.addEventListener('click', () => {
+    window.location.href = 'cielo.html';
+  });
+}
+
+// Botón Nuestro Libro
+const btnLibro = document.getElementById('btn-libro-widget');
+if (btnLibro) {
+  btnLibro.addEventListener('click', () => {
+    window.location.href = 'libro.html';
+  });
+}
