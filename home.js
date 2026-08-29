@@ -360,20 +360,44 @@ const btnDownload = document.getElementById('btn-download-widget');
 if (btnDownload) {
   btnDownload.addEventListener('click', async () => {
     try {
-      // Usar html2canvas si está disponible, sino usar captura nativa
       if (typeof html2canvas !== 'undefined') {
-        const canvas = await html2canvas(document.querySelector('.ramo-scene'), {
-          backgroundColor: null,
-          scale: 2
+        // 1. Seleccionar los elementos de la interfaz a ocultar
+        const uiElements = document.querySelectorAll('.widget, .back-link');
+        
+        // 2. Ocultarlos temporalmente desactivando transiciones para que sea instantáneo
+        uiElements.forEach(el => {
+          el.style.transition = 'none';
+          el.style.opacity = '0';
         });
+
+        // Pausa ultracorta para asegurar que el navegador aplique la invisibilidad
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        // Evitar cortes en la imagen subiendo el scroll
+        window.scrollTo(0, 0);
+
+        // 3. Capturar el body completo para incluir el fondo
+        const canvas = await html2canvas(document.body, {
+          backgroundColor: '#160c18', 
+          scale: 2, // Alta resolución
+          useCORS: true
+        });
+
+        // 4. Restaurar la visibilidad de la interfaz
+        uiElements.forEach(el => {
+          el.style.transition = ''; 
+          el.style.opacity = '1';
+        });
+
+        // 5. Descargar la imagen
         const link = document.createElement('a');
-        link.href = canvas.toDataURL();
-        link.download = 'mi-ramo-hermoso.png';
+        link.href = canvas.toDataURL('image/png');
+        link.download = 'Mi_Ramo_Eterno.png';
         link.click();
+        
         btnDownload.textContent = '✅ Guardado';
         setTimeout(() => { btnDownload.textContent = '📸 Guardar Foto'; }, 2000);
       } else {
-        // Fallback: usar screenshot API si está disponible
         if (navigator.screenshot) {
           const canvas = await navigator.screenshot.captureScreen();
           const link = document.createElement('a');
@@ -386,6 +410,10 @@ if (btnDownload) {
       }
     } catch (error) {
       console.error('Error al capturar pantalla:', error);
+      // Asegurar que la interfaz reaparezca si ocurre un error
+      document.querySelectorAll('.widget, .back-link, .ramo-caption').forEach(el => {
+        el.style.opacity = '1';
+      });
     }
   });
 }

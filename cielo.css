@@ -674,3 +674,30 @@ body.page-ready .page-transition {
   50% { width: 28px; }
   100% { width: 0; }
 }
+
+@media (max-width: 480px) {
+  .sky-section {
+    padding: 16px;
+  }
+  .glass-card {
+    padding: 24px 16px;
+    border-radius: 20px;
+  }
+  .sky-title {
+    font-size: 1.7rem;
+  }
+  .sky-text {
+    font-size: 1.1rem;
+  }
+  .num {
+    font-size: 1.25rem;
+  }
+  .book-link {
+    min-width: 180px;
+    padding: 10px 16px;
+  }
+  .side-nav {
+    right: 8px;
+    transform: translateY(-50%) scale(0.85); 
+  }
+}
