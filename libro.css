@@ -77,7 +77,7 @@ body::after {
   box-shadow: 18px 24px 60px rgba(0,0,0,.35), -2px 0 0 rgba(255,255,255,.6);
   border-radius: 3px 12px 12px 3px;
   overflow: hidden;
-  perspective: 1200px;
+  perspective: 2000px;
   transition: width .8s cubic-bezier(.2,.8,.2,1), transform .7s cubic-bezier(.2,.8,.2,1), box-shadow .7s ease, background .8s ease;
 }
 .book.book-open { width: min(100%, 1100px); transform: rotateY(-2deg) translateY(-4px); background: linear-gradient(90deg, #fffaf2 0%, #fffdf8 49.5%, #eadfd6 50%, #fffdf8 50.5%, #fffaf2 100%); box-shadow: 22px 30px 70px rgba(0,0,0,.48), -2px 0 0 rgba(255,255,255,.6); }
@@ -110,6 +110,8 @@ body::after {
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: rgba(186,83,109,.35) transparent;
+  transform-style: preserve-3d;
+  transform-origin: left center;
 }
 .book-page.page-active { opacity: 1; transform: translateX(0); pointer-events: auto; }
 .book-open .book-page:not(.book-cover):not(.photo-page):not(.book-ending) { justify-content: flex-start; padding-top: clamp(54px, 7vw, 78px); gap: 8px; }
@@ -118,30 +120,127 @@ body::after {
 .book-open .book-page.page-active { left: 0; }
 .book-single-end .book-page.page-active { left: 0; width: 100%; padding-left: clamp(42px, 7vw, 78px); padding-right: clamp(42px, 7vw, 78px); }
 .book-single-end .book-page.page-companion { display: none; }
-.book-page.page-enter-next { animation: pageEnterNext .6s cubic-bezier(.22,.68,.29,1.03) both; z-index: 3; }
-.book-page.page-enter-prev { animation: pageEnterPrev .6s cubic-bezier(.22,.68,.29,1.03) both; z-index: 3; }
-.book-page.page-exit-next { animation: pageExitNext .5s cubic-bezier(.55,.06,.68,.19) forwards; z-index: 2; }
-.book-page.page-exit-prev { animation: pageExitPrev .5s cubic-bezier(.55,.06,.68,.19) forwards; z-index: 2; }
-@keyframes pageEnterNext {
-  from { opacity: 0; transform: translateX(90px) rotateY(-42deg); }
-  to { opacity: 1; transform: translateX(0) rotateY(0); }
+/* ==========================================
+   1. FONDOS Y EJES DE ROTACIÓN (LOMO)
+   ========================================== */
+/* Solución a la transparencia: Fondo sólido para que las hojas oculten lo que hay debajo al girar */
+.book-page:not(.book-cover):not(.book-ending) { background: var(--paper); }
+
+/* Lomo (Eje Y) para escritorio */
+.book-open .book-page.page-active,
+.book-open .book-page.page-exit-prev { 
+  transform-origin: right center; 
 }
-@keyframes pageEnterPrev {
-  from { opacity: 0; transform: translateX(-90px) rotateY(42deg); }
-  to { opacity: 1; transform: translateX(0) rotateY(0); }
+.book-open .book-page.page-companion { 
+  transform-origin: left center; 
 }
-@keyframes pageExitNext {
-  from { opacity: 1; transform: translateX(0) rotateY(0); }
-  to { opacity: 0; transform: translateX(-90px) rotateY(42deg); }
+.book-single-end .book-page.page-active,
+.book-single-end .book-page.page-exit-prev { 
+  transform-origin: right center; 
 }
-@keyframes pageExitPrev {
-  from { opacity: 1; transform: translateX(0) rotateY(0); }
-  to { opacity: 0; transform: translateX(90px) rotateY(-42deg); }
+
+/* Solución al retraso: Eliminar la transición por defecto durante las animaciones */
+.book-page.page-enter-next, .book-page.page-exit-next,
+.book-page.page-enter-prev, .book-page.page-exit-prev {
+  transition: none !important;
+  backface-visibility: visible;
+}
+
+/* ==========================================
+   2. ANIMACIONES ESCRITORIO Y CIERRE
+   ========================================== */
+/* AVANZAR: La nueva hoja viene girando desde la derecha (180deg) hacia la izquierda (0deg) */
+.book-open .book-page.page-enter-next,
+.book-single-end .book-page.page-enter-next {
+  animation: flipFromRight 0.7s cubic-bezier(0.25, 1, 0.5, 1) both;
+  z-index: 4;
+}
+.book-open .book-page.page-exit-next,
+.book-single-end .book-page.page-exit-next {
+  animation: stayUnder 0.7s forwards;
+  z-index: 1;
+}
+
+/* RETROCEDER: La hoja actual se levanta y gira hacia la derecha */
+.book-open .book-page.page-exit-prev,
+.book-single-end .book-page.page-exit-prev {
+  animation: flipToRight 0.7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  z-index: 4;
+}
+
+.book-open .book-page.page-enter-prev,
+.book-single-end .book-page.page-enter-prev {
+  animation: stayVisible 0.7s forwards;
+  z-index: 1;
+}
+
+/* ==========================================
+   3. ANIMACIONES MÓVIL (1 sola página)
+   ========================================== */
+/* Móvil AVANZAR: La hoja actual se voltea hacia la izquierda */
+.book-page.page-exit-next:not(.book-open .book-page):not(.book-single-end .book-page) {
+  animation: flipToLeft 0.7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  transform-origin: left center;
+  z-index: 4;
+}
+.book-page.page-enter-next:not(.book-open .book-page):not(.book-single-end .book-page) {
+  animation: stayUnder 0.7s forwards;
+  z-index: 1;
+}
+
+/* Móvil RETROCEDER: Corrección de desaparición de texto */
+.book-page.page-enter-prev:not(.book-open .book-page):not(.book-single-end .book-page) {
+  animation: flipFromLeft 0.7s cubic-bezier(0.25, 1, 0.5, 1) both;
+  transform-origin: left center;
+  z-index: 4;
+}
+.book-page.page-exit-prev:not(.book-open .book-page):not(.book-single-end .book-page) {
+  animation: stayVisible 0.7s forwards;
+  z-index: 1;
+}
+
+/* ==========================================
+   4. KEYFRAMES 3D
+   ========================================== */
+@keyframes flipFromRight {
+  0% { transform: rotateY(180deg) skewY(-3deg); filter: brightness(0.6); }
+  100% { transform: rotateY(0deg) skewY(0deg); filter: brightness(1); }
+}
+@keyframes flipToRight {
+  0% { transform: rotateY(0deg) skewY(0deg); filter: brightness(1); opacity: 1; }
+  100% { transform: rotateY(180deg) skewY(3deg); filter: brightness(0.6); opacity: 0; }
+}
+@keyframes flipToLeft {
+  0% { transform: rotateY(0deg) skewY(0deg); filter: brightness(1); opacity: 1; }
+  100% { transform: rotateY(-180deg) skewY(-3deg); filter: brightness(0.6); opacity: 0; }
+}
+@keyframes flipFromLeft {
+  0% { transform: rotateY(-180deg) skewY(3deg); filter: brightness(0.6); }
+  100% { transform: rotateY(0deg) skewY(0deg); filter: brightness(1); }
+}
+@keyframes stayUnder {
+  0% { opacity: 1; transform: rotateY(0deg); }
+  99% { opacity: 1; transform: rotateY(0deg); }
+  100% { opacity: 0; }
+}
+@keyframes stayVisible {
+  0% { opacity: 1; transform: rotateY(0deg); }
+  100% { opacity: 1; transform: rotateY(0deg); }
+}
+@keyframes slideFromLeftDesktop {
+  0% { opacity: 1; transform: rotateY(0deg) translateX(-24px); }
+  100% { opacity: 1; transform: rotateY(0deg) translateX(0); }
 }
 .book-controls { position: relative; z-index: 20; }
 .book-cover { transform-origin: left center; z-index: 5; }
 .book-cover .page-button { position: relative; z-index: 6; pointer-events: auto; }
-.book-open .book-cover { transform: rotateY(-105deg); opacity: 0; pointer-events: none; }
+.book-open .book-cover { pointer-events: none; }
+.book-open .book-cover.page-exit-next {
+  animation: flipToLeft 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  width: 560px !important;
+  max-width: 100% !important;
+  z-index: 5;
+}
 .book-cover, .book-ending { text-align: center; align-items: center; background: linear-gradient(140deg, #fffaf2, #f8e8df); }
 .book-ending { gap: 14px; }
 .book-ending h2 { max-width: 94%; font-size: clamp(1.7rem, 4vw, 2.7rem); line-height: 1.18; text-wrap: balance; }
