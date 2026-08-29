@@ -24,13 +24,16 @@ function showPage(pageIndex, direction = 1) {
     book.classList.remove('book-open', 'book-single-end');
   }
   
-  // Actualizar clases de las páginas
+ // Actualizar clases de las páginas
   pages.forEach((page, index) => {
     page.classList.remove('page-active', 'page-companion', 'page-enter-next', 'page-enter-prev', 'page-exit-next', 'page-exit-prev');
     
     if (index === currentPage) {
       page.classList.add('page-active');
-      page.classList.add(direction >= 0 ? 'page-enter-next' : 'page-enter-prev');
+      // Solo aplicar la animación de entrada si hay un cambio de página real
+      if (isPageChanging) {
+        page.classList.add(direction >= 0 ? 'page-enter-next' : 'page-enter-prev');
+      }
     } else if (isSpread() && index === currentPage + 1) {
       page.classList.add('page-companion');
     }
@@ -105,5 +108,51 @@ document.addEventListener('keydown', (event) => {
   if (event.key === 'ArrowLeft') goToPreviousPage();
   if (event.key === 'ArrowRight') goToNextPage();
 });
+
+// ==========================================
+// NUEVAS FUNCIONES: SWIPE Y CLIC EN BORDES
+// ==========================================
+
+// 1. Clic en los lados del libro para cambiar de página
+book.addEventListener('click', (e) => {
+  // Ignorar si se hace clic en un botón o en el enlace de "volver"
+  if (e.target.closest('button') || e.target.closest('a')) return;
+
+  const rect = book.getBoundingClientRect();
+  const clickX = e.clientX - rect.left;
+
+  // Si hace clic en la mitad izquierda
+  if (clickX < rect.width / 2) {
+    goToPreviousPage();
+  } else {
+    // Si hace clic en la mitad derecha
+    goToNextPage();
+  }
+});
+
+// 2. Soporte para deslizar (Swipe) en pantallas táctiles
+let touchStartX = 0;
+let touchEndX = 0;
+
+book.addEventListener('touchstart', (e) => {
+  touchStartX = e.changedTouches[0].screenX;
+}, { passive: true });
+
+book.addEventListener('touchend', (e) => {
+  touchEndX = e.changedTouches[0].screenX;
+  handleSwipe();
+}, { passive: true });
+
+function handleSwipe() {
+  const swipeThreshold = 40; // Distancia mínima para considerarlo un deslizamiento
+  
+  if (touchEndX < touchStartX - swipeThreshold) {
+    goToNextPage(); // Deslizó hacia la izquierda
+  }
+  
+  if (touchEndX > touchStartX + swipeThreshold) {
+    goToPreviousPage(); // Deslizó hacia la derecha
+  }
+}
 
 showPage(0);

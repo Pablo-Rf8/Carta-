@@ -176,3 +176,27 @@ body.page-leaving .page-transition { opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
   .blooming-flower { filter: none; }
 }
+
+@media (max-width: 480px) {
+  .envoltura-sobre {
+    width: 280px; 
+    height: 190px;
+  }
+  .hero-title {
+    font-size: 2.8rem; 
+  }
+  .carta {
+    padding: 20px 15px; 
+  }
+  .letter-title {
+    font-size: 1.4rem;
+  }
+  .letter-body {
+    font-size: 1.15rem;
+  }
+  @keyframes abrir-carta {
+    0% { transform: translate(-50%, -40%) scale(1); opacity: 0; z-index: 1; }
+    40% { transform: translate(-50%, -100%) scale(1.05); opacity: 1; z-index: 20; }
+    100% { transform: translate(-50%, calc(-50% - 10px)) scale(1); opacity: 1; z-index: 30; width: 92vw; height: 75vh; top: 50%; }
+  }
+}
