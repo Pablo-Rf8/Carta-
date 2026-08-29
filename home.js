@@ -266,9 +266,10 @@ widgetElements.forEach(widget => {
   let isDragging = false;
   let startX, startY, initialLeft, initialTop;
 
-  const dragStart = (e) => {
-    // Evitar arrastrar si hizo clic en un botón o iframe
+ const dragStart = (e) => {
+    // Evitar arrastrar si hizo clic en un botón, enlace o iframe
     if(e.target.tagName.toLowerCase() === 'button' || 
+       e.target.tagName.toLowerCase() === 'a' ||
        e.target.tagName.toLowerCase() === 'iframe' ||
        e.target.closest('iframe')) {
       return;
@@ -292,6 +293,9 @@ widgetElements.forEach(widget => {
     initialTop = percentToPixels(topStr, window.innerHeight);
     initialLeft = percentToPixels(leftStr, window.innerWidth);
     
+    // FIJAR VISIBILIDAD ANTES DE ELIMINAR LA ANIMACIÓN
+    widget.style.opacity = '1';
+    widget.style.transform = 'scale(1) rotate(0deg)';
     widget.style.animation = 'none';
   };
 

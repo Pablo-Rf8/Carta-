@@ -35,7 +35,7 @@
 
   <!-- MÚSICA DE FONDO -->
   <audio id="bg-music" loop preload="auto">
-    <source src="cancion.mp3" type="audio/mp3">
+    <source src="audio/A_Love_Like_Her.mp3" type="audio/mp3">
   </audio>
 
   <!-- Ramo en forma de corazón -->
@@ -84,6 +84,11 @@
   <iframe id="visor-magico" class="hidden" src="" allow="autoplay"></iframe>
 
   <script src="script.js"></script>
+
+  <script>
+  // Selecciona el audio y reduce el volumen a la mitad (0.5)
+  document.getElementById('bg-music').volume = 0.1;
+</script>
 
   <!-- SCRIPT MÁGICO PARA MÚSICA Y TRANSICIÓN -->
   <script>
