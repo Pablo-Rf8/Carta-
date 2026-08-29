@@ -137,7 +137,7 @@ body {
   width: clamp(60px, 14%, 140px);
   aspect-ratio: 1 / 1;
   transform: translate(-50%, 28%);
-  z-index: 5;
+  z-index: 9;
   pointer-events: none;
 }
 .bow-loop {
@@ -180,6 +180,50 @@ body {
 .bow-tail-right { left: 68%; transform: translateX(-50%) rotate(14deg); }
 
 /* =========================================================
+   PAPEL: dos láminas superpuestas (una más oscura detrás, girada
+   al otro lado) que convergen en el punto del lazo, simulando el
+   papel kraft/cascada que envuelve la base de un ramo real.
+   ========================================================= */
+.paper-wrap {
+  position: absolute;
+  left: 50%;
+  bottom: 0%;
+  width: 74%;
+  height: 48%;
+  transform: translateX(-50%);
+  z-index: 2;
+  pointer-events: none;
+}
+.paper-back {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(4% 16%, 40% 0%, 60% 9%, 96% 18%, 50% 100%);
+  background: linear-gradient(150deg, #f3d9ae 0%, #d9a468 60%, #b9793f 100%);
+  transform-origin: 50% 100%;
+  transform: rotate(-4deg);
+  box-shadow: 0 14px 26px rgba(50, 25, 10, 0.3);
+}
+.paper-front {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(9% 12%, 38% 24%, 50% 3%, 64% 21%, 91% 9%, 50% 100%);
+  background: linear-gradient(160deg, #fffaf2 0%, #f6dfb8 55%, #e3b47f 100%);
+  transform-origin: 50% 100%;
+  transform: rotate(3deg);
+  box-shadow: 0 10px 22px rgba(50, 25, 10, 0.22);
+}
+.paper-crease {
+  position: absolute;
+  left: 50%;
+  top: 8%;
+  width: 2px;
+  height: 86%;
+  background: linear-gradient(180deg, transparent, rgba(110, 65, 28, 0.4), transparent);
+  transform-origin: bottom center;
+  transform: translateX(-50%) rotate(2deg);
+}
+
+/* =========================================================
    FLORES: wrapper = solo posición/tamaño (estático, en %).
    .flor-mover = todo el movimiento (JS le controla el transform
    completo cada frame: mecido + paralaje + espejo si aplica).
@@ -197,36 +241,261 @@ body {
   will-change: transform;
   transform-origin: 50% 65%;
 }
+/* Pequeñas variaciones de tono para que las flores repetidas (mismo PNG
+   reutilizado varias veces) no se vean como copias idénticas apiladas. */
+.tint-a { filter: hue-rotate(8deg) saturate(1.1) brightness(1.03); }
+.tint-b { filter: hue-rotate(-10deg) saturate(0.92) brightness(0.96); }
+.tint-c { filter: hue-rotate(4deg) saturate(1.18) brightness(1.06); }
 
 /* --- Hojas (fondo): las más grandes en superficie, dan volumen --- */
-.leaf { z-index: 2; }
-.leaf-1 { left: 1%;  bottom: 26%; width: 44%; }
-.leaf-2 { right: -1%; bottom: 29%; width: 46%; }
-.leaf-3 { left: 15%; bottom: 50%; width: 38%; }
-.leaf-4 { right: 12%; bottom: 53%; width: 32%; }
+.leaf { z-index: 3; }
+.leaf-1 { left: -6%;  bottom: 22%; width: 52%; }
+.leaf-2 { right: -8%; bottom: 24%; width: 54%; }
+.leaf-3 { left: 6%;   bottom: 44%; width: 44%; }
+.leaf-4 { right: 4%;  bottom: 47%; width: 38%; }
+.leaf-5 { left: 24%;  bottom: 58%; width: 30%; z-index: 2; }
+.leaf-6 { right: 22%; bottom: 60%; width: 28%; z-index: 2; }
 
-/* --- Girasoles (medio) --- */
-.sun { z-index: 3; }
-.sun-1 { left: 4%;  bottom: 37%; width: 33%; }
-.sun-2 { right: 2%; bottom: 35%; width: 33%; }
+/* --- Girasoles (medio): 2 principales + 6 chicos de relleno --- */
+.sun { z-index: 4; }
+.sun-1 { left: -2%; bottom: 34%; width: 40%; }
+.sun-2 { right: -4%; bottom: 32%; width: 40%; }
+.sun-3 { left: -11%; bottom: 45%; width: 23%; z-index: 3; }
+.sun-4 { right: -13%; bottom: 43%; width: 23%; z-index: 3; }
+.sun-5 { left: 8%;  bottom: 20%; width: 21%; z-index: 4; }
+.sun-6 { right: 6%; bottom: 19%; width: 21%; z-index: 4; }
+.sun-7 { left: -15%; bottom: 42%; width: 48%; z-index: 5; }
+.sun-8 { right: -17%; bottom: 40%; width: 48%; z-index: 5; }
 
-/* --- Peonías (frente): las protagonistas, forman el centro del ramo --- */
-.peony { z-index: 4; }
-.peony-1 { left: 22%;  bottom: 47%; width: 43%; }
-.peony-2 { left: 38%;  bottom: 54%; width: 42%; z-index: 5; }
-.peony-3 { right: 18%; bottom: 45%; width: 43%; }
-.peony-4 { left: 32%;  bottom: 33%; width: 42%; z-index: 6; }
+/* --- Peonías (frente): las protagonistas, MUY juntas y superpuestas
+   para el look "buchón" (denso, aglomerado, sin huecos entre flores).
+   Las 4 principales (peony-1 a 4) son las más grandes; el resto son
+   chicas de relleno repartidas por todos los huecos que van quedando,
+   y peony-9/11/17/18 se asoman bien al frente cerca del papel. --- */
+.peony { z-index: 5; }
+.peony-1 { left: 10%;  bottom: 40%; width: 62%; }
+.peony-2 { left: 28%;  bottom: 46%; width: 62%; z-index: 6; }
+.peony-3 { right: 5%;  bottom: 38%; width: 62%; }
+.peony-4 { left: 22%;  bottom: 24%; width: 60%; z-index: 7; }
+
+.peony-5  { left: -2%;  bottom: 54%; width: 35%; z-index: 3; }
+.peony-6  { right: -4%; bottom: 53%; width: 35%; z-index: 3; }
+.peony-7  { left: -8%;  bottom: 28%; width: 32%; z-index: 3; }
+.peony-8  { right: -10%; bottom: 27%; width: 32%; z-index: 3; }
+.peony-10 { left: 36%;  bottom: 58%; width: 30%; z-index: 3; }
+.peony-12 { left: 14%;  bottom: 59%; width: 32%; z-index: 3; }
+.peony-13 { right: 12%; bottom: 58%; width: 30%; z-index: 3; }
+.peony-14 { left: -4%;  bottom: 31%; width: 33%; z-index: 4; }
+.peony-15 { right: -6%; bottom: 30%; width: 33%; z-index: 4; }
+.peony-16 { left: 40%;  bottom: 64%; width: 28%; z-index: 2; }
+
+.peony-9  { left: 30%; bottom: 13%; width: 36%; z-index: 8; }
+.peony-11 { left: 48%; bottom: 11%; width: 34%; z-index: 8; }
+.peony-17 { left: 12%; bottom: 10%; width: 32%; z-index: 8; }
+.peony-18 { right: 10%; bottom: 9%; width: 32%; z-index: 8; }
+
+.peony-19 { left: 8%;   bottom: 22%; width: 38%; z-index: 6; }
+.peony-20 { right: 8%;  bottom: 22%; width: 38%; z-index: 6; }
+.peony-21 { left: 35%;  bottom: 70%; width: 26%; z-index: 2; }
+.peony-22 { right: 32%; bottom: 69%; width: 26%; z-index: 2; }
 
 /* =========================================================
-   RESPONSIVE: en celular baja un poco el volumen relativo para
-   que no se corten las flores de los bordes, pero el ramo sigue
-   siendo lo más grande de la pantalla.
+   PASTO / HIERBA: muchas briznas de CSS puro (generadas por JS),
+   densas y de distintos verdes, para el efecto "silvestre" bien lleno.
+   ========================================================= */
+.grass-field {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.grass {
+  position: absolute;
+  left: 50%;
+  bottom: -1%;
+  width: clamp(5px, 1.5%, 20px);
+  background: linear-gradient(180deg, var(--g-light, #6fa858), var(--g-dark, #1f3d1a) 88%);
+  clip-path: polygon(46% 0%, 80% 12%, 100% 100%, 0% 100%, 12% 16%);
+  border-radius: 60% 40% 0 0 / 100% 100% 0 0;
+  transform-origin: bottom center;
+  transform: translateX(-50%) rotate(var(--g-angle, 0deg));
+  will-change: transform;
+  box-shadow: inset -2px 0 4px rgba(0, 0, 0, 0.2);
+}
+
+/* =========================================================
+   MATAS DE HOJAS EN LA BASE: varios bultos verdes MUY superpuestos
+   (no esferas separadas) para que se vean como follaje tupido y no
+   como burbujas en fila. Gradiente plano, sin brillo de esfera.
+   ========================================================= */
+.leaf-mound {
+  position: absolute;
+  bottom: -10%;
+  z-index: 1;
+  background: linear-gradient(155deg, #3f6a34 0%, #24461d 55%, #142b0d 100%);
+  box-shadow: inset 0 8px 14px rgba(0, 0, 0, 0.25);
+}
+.mound-1 { left: -4%;  width: 26%; aspect-ratio: 1 / 0.68; border-radius: 58% 42% 52% 48% / 48% 52% 48% 52%; bottom: -9%; }
+.mound-2 { left: 12%;  width: 30%; aspect-ratio: 1 / 0.62; border-radius: 45% 55% 48% 52% / 55% 45% 55% 45%; bottom: -12%; }
+.mound-3 { left: 30%;  width: 28%; aspect-ratio: 1 / 0.66; border-radius: 52% 48% 55% 45% / 45% 55% 48% 52%; bottom: -8%; }
+.mound-4 { left: 46%;  width: 30%; aspect-ratio: 1 / 0.6;  border-radius: 48% 52% 45% 55% / 52% 48% 55% 45%; bottom: -13%; }
+.mound-5 { left: 62%;  width: 28%; aspect-ratio: 1 / 0.66; border-radius: 55% 45% 52% 48% / 48% 55% 45% 52%; bottom: -8%; }
+.mound-6 { left: 78%;  width: 30%; aspect-ratio: 1 / 0.62; border-radius: 45% 55% 48% 52% / 55% 48% 52% 45%; bottom: -12%; }
+.mound-7 { right: -6%; width: 26%; aspect-ratio: 1 / 0.68; border-radius: 52% 48% 58% 42% / 48% 52% 45% 55%; bottom: -9%; }
+
+
+/* =========================================================
+   TARJETA EN MEDIO DEL RAMO
+   ========================================================= */
+.tarjeta-ramo {
+  display: none;
+}
+
+.tarjeta-titulo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.2rem, 4vw, 1.8rem);
+  color: var(--rose-deep);
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.spotify-box {
+  margin: 16px 0;
+}
+
+.spotify-box iframe {
+  max-width: 100%;
+  border-radius: 12px !important;
+}
+
+.botones-carta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: clamp(0.85rem, 2vw, 1rem);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(217, 92, 134, 0.3);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(217, 92, 134, 0.5);
+}
+
+.btn-magico {
+  background: linear-gradient(135deg, var(--gold), #f4c26f);
+  color: #000;
+}
+
+.btn-magico:hover {
+  background: linear-gradient(135deg, #f4d06f, var(--gold));
+}
+
+/* =========================================================
+   WIDGETS ARRASTRABLES (Efecto Cristal Mejorado)
+   ========================================================= */
+.widget {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-radius: 20px;
+  padding: 14px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 2px 8px rgba(255, 255, 255, 0.1);
+  z-index: 35;
+  cursor: grab;
+  opacity: 0;
+  animation: popInWidget 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  transition: all 0.3s ease;
+}
+
+.widget:hover {
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), inset 0 2px 8px rgba(255, 255, 255, 0.15);
+  transform: translateY(-4px);
+}
+
+.widget:active {
+  cursor: grabbing;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+#widget-spotify { animation-delay: 1.8s; }
+#widget-play { animation-delay: 2.0s; }
+#widget-cielo { animation-delay: 2.2s; }
+#widget-download { animation-delay: 2.4s; }
+#widget-libro { animation-delay: 2.6s; }
+
+@keyframes popInWidget {
+  0% { opacity: 0; transform: scale(0.6) rotate(-5deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+.widget .btn {
+  background: linear-gradient(135deg, rgba(255, 20, 80, 0.7), rgba(255, 100, 150, 0.6));
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 14px 22px;
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  pointer-events: auto;
+  box-shadow: 0 4px 12px rgba(255, 20, 80, 0.3);
+  white-space: nowrap;
+  min-width: 140px;
+}
+
+.widget .btn:hover { 
+  background: linear-gradient(135deg, rgba(255, 40, 100, 0.9), rgba(255, 120, 170, 0.9));
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 20, 80, 0.5);
+}
+
+.widget .btn:active {
+  transform: translateY(0);
+}
+
+.widget .btn-magico {
+  background: linear-gradient(135deg, var(--gold), #f4c26f);
+  color: #2a1a00;
+  border: none;
+  font-weight: 700;
+  box-shadow: 0 6px 18px rgba(244, 208, 111, 0.4);
+  min-width: 160px;
+}
+
+.widget .btn-magico:hover {
+  background: linear-gradient(135deg, #ffd700, var(--gold));
+  box-shadow: 0 8px 24px rgba(244, 208, 111, 0.6);
+}
+
+/* =========================================================
+   RESPONSIVE TARJETA
    ========================================================= */
 @media (max-width: 560px) {
-  .ramo-container { width: min(96vw, 600px); height: min(66vh, 620px); }
-  .leaf-1 { left: -3%; width: 48%; }
-  .leaf-2 { right: -5%; width: 50%; }
-  .ramo-title { font-size: clamp(1.3rem, 6vw, 1.8rem); }
+  .tarjeta-ramo { 
+    width: 85vw;
+    padding: 20px;
+  }
+  .botones-carta {
+    gap: 8px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

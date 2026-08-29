@@ -7,6 +7,7 @@
 
 const container = document.getElementById('ramoContainer');
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const isMobileViewport = window.matchMedia('(max-width: 560px)').matches;
 
 /* ---------------------------------------------------------
    1. PERFIL DE MOVIMIENTO POR CAPA
@@ -25,10 +26,15 @@ const LAYER_PROFILES = {
   back:  { rotAmp: [3, 5.5],   rotFreq: [0.22, 0.34], yAmp: [4, 7],   yFreq: [0.28, 0.4],  xAmp: [3, 5],   xFreq: [0.18, 0.3],  parallax: 7  },
   mid:   { rotAmp: [2.5, 4],   rotFreq: [0.2, 0.3],   yAmp: [3, 5.5], yFreq: [0.22, 0.32], xAmp: [2.5, 4], xFreq: [0.16, 0.26], parallax: 14 },
   front: { rotAmp: [1.4, 2.6], rotFreq: [0.13, 0.2],  yAmp: [5, 8.5], yFreq: [0.16, 0.24], xAmp: [3, 5.5], xFreq: [0.12, 0.2],  parallax: 23 },
-  stem:  { rotAmp: [2, 4],     rotFreq: [0.18, 0.3],  yAmp: [0, 0],   yFreq: [0, 0],       xAmp: [0, 0],   xFreq: [0, 0],       parallax: 0  }
+  stem:  { rotAmp: [2, 4],     rotFreq: [0.18, 0.3],  yAmp: [0, 0],   yFreq: [0, 0],       xAmp: [0, 0],   xFreq: [0, 0],       parallax: 0  },
+  // El pasto es lo más liviano de toda la escena: es lo primero que se
+  // mueve con cualquier corriente de aire, así que tiene el mayor ángulo
+  // y la mayor frecuencia de todos los elementos.
+  grass: { rotAmp: [4, 7.5],   rotFreq: [0.3, 0.48],  yAmp: [0, 0],   yFreq: [0, 0],       xAmp: [0, 0],   xFreq: [0, 0],       parallax: 0  }
 };
 
 const rand = (min, max) => min + Math.random() * (max - min);
+const lerp = (a, b, t) => a + (b - a) * t;
 
 function buildState(el, profile, extra = {}) {
   return {
@@ -70,6 +76,62 @@ const stemState = [...document.querySelectorAll('.stem')].map((el) => {
   el.style.setProperty('--base-angle', `${baseAngle}deg`);
   return buildState(el, LAYER_PROFILES.stem, { baseAngle });
 });
+
+/* ---------------------------------------------------------
+   3.5 GENERAR EL PASTO/HIERBA
+   Muchas briznas de CSS puro repartidas a lo ancho del ramo, más
+   altas hacia los costados (como en un ramo silvestre que se
+   "desborda" de verde), con distintos tonos para dar profundidad.
+   Menos cantidad en celular por rendimiento.
+   --------------------------------------------------------- */
+const GRASS_COLORS = [
+  { light: '#7fbf66', dark: '#1f3d1a' },
+  { light: '#5f9c4a', dark: '#173015' },
+  { light: '#93cf78', dark: '#2a4d22' }
+];
+const GRASS_COUNT = isMobileViewport ? 16 : 26;
+
+function createGrass() {
+  const grassField = document.getElementById('grassField');
+  const blades = [];
+  for (let i = 0; i < GRASS_COUNT; i++) {
+    const t = i / (GRASS_COUNT - 1);
+    const edgeBoost = Math.abs(t - 0.5) * 2; // 0 en el centro, 1 en los bordes
+    const left = lerp(-12, 112, t) + rand(-3, 3);
+    const lenPct = rand(30, 46) + edgeBoost * rand(14, 30); // más altas hacia los costados
+    const angle = lerp(-28, 28, t) + rand(-7, 7);
+    const color = GRASS_COLORS[Math.floor(Math.random() * GRASS_COLORS.length)];
+
+    const blade = document.createElement('div');
+    blade.className = 'grass';
+    blade.style.left = `${left}%`;
+    blade.dataset.lenPct = lenPct; // % respecto al ANCHO del contenedor (ver applyGrassSizing)
+    blade.style.setProperty('--g-angle', `${angle}deg`);
+    blade.style.setProperty('--g-light', color.light);
+    blade.style.setProperty('--g-dark', color.dark);
+    grassField.appendChild(blade);
+    blades.push({ el: blade, baseAngle: angle });
+  }
+  return blades;
+}
+
+const grassState = createGrass().map((g) => buildState(g.el, LAYER_PROFILES.grass, { baseAngle: g.baseAngle }));
+
+/* Alto de cada brizna en base al ANCHO del contenedor, no a su alto.
+   Si se calculara sobre el alto (contenedor angosto y muy vertical en
+   celular), con los ángulos inclinados las puntas terminaban "volando"
+   muy lejos hacia los costados y se salían de la pantalla. Al basarlo en
+   el ancho, la inclinación siempre queda proporcional a cuánto espacio
+   horizontal hay disponible, en cualquier tamaño de pantalla. */
+function applyGrassSizing() {
+  const w = container.clientWidth;
+  grassState.forEach((g) => {
+    const lenPct = parseFloat(g.el.dataset.lenPct);
+    g.el.style.height = `${(lenPct / 100) * w}px`;
+  });
+}
+applyGrassSizing();
+window.addEventListener('resize', applyGrassSizing);
 
 /* ---------------------------------------------------------
    4. ESCALAR LAS AMPLITUDES SEGÚN EL TAMAÑO REAL DEL RAMO
@@ -128,8 +190,12 @@ function tick(now) {
   parX += (targetParX - parX) * 0.055;
   parY += (targetParY - parY) * 0.055;
 
-  // Tallos: solo rotan alrededor de su base (ya anclada abajo-centro por CSS)
+  // Tallos y pasto: solo rotan alrededor de su base (ya anclada por CSS)
   stemState.forEach((s) => {
+    const sway = Math.sin(t * s.rotFreq * Math.PI * 2 + s.rotPhase) * s.rotAmp * scaleFactor;
+    s.el.style.transform = `translateX(-50%) rotate(${s.baseAngle + sway}deg)`;
+  });
+  grassState.forEach((s) => {
     const sway = Math.sin(t * s.rotFreq * Math.PI * 2 + s.rotPhase) * s.rotAmp * scaleFactor;
     s.el.style.transform = `translateX(-50%) rotate(${s.baseAngle + sway}deg)`;
   });
@@ -168,11 +234,174 @@ document.addEventListener('visibilitychange', () => {
 
 if (prefersReducedMotion) {
   // Con "reducir movimiento" activado: se aplican solo los ángulos base de
-  // los tallos (el ramo queda quieto, sin mecido ni paralaje) para respetar
-  // la preferencia de accesibilidad del usuario.
+  // los tallos y el pasto (el ramo queda quieto, sin mecido ni paralaje)
+  // para respetar la preferencia de accesibilidad del usuario.
   stemState.forEach((s) => {
+    s.el.style.transform = `translateX(-50%) rotate(${s.baseAngle}deg)`;
+  });
+  grassState.forEach((s) => {
     s.el.style.transform = `translateX(-50%) rotate(${s.baseAngle}deg)`;
   });
 } else {
   startLoop();
+}
+
+/* ==========================================
+   LÓGICA PARA ARRASTRAR WIDGETS (Drag & Drop)
+   ========================================== */
+const widgets = document.querySelectorAll('.widget');
+let highestZ = 40;
+
+// Función para clampar valores
+function clampValue(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+widgets.forEach(widget => {
+  let isDragging = false;
+  let startX, startY, initialLeft, initialTop;
+
+  const dragStart = (e) => {
+    // Evitar arrastrar si hizo clic en un botón o iframe
+    if(e.target.tagName.toLowerCase() === 'button' || 
+       e.target.tagName.toLowerCase() === 'iframe' ||
+       e.target.closest('iframe')) {
+      return;
+    }
+
+    isDragging = true;
+    highestZ++;
+    widget.style.zIndex = highestZ;
+    widget.style.transition = 'none'; // Quitar transiciones durante el drag
+    
+    const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+    const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+
+    startX = clientX;
+    startY = clientY;
+    
+    initialLeft = widget.offsetLeft;
+    initialTop = widget.offsetTop;
+    
+    widget.style.animation = 'none';
+  };
+
+  const drag = (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+
+    const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+    const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+
+    const dx = clientX - startX;
+    const dy = clientY - startY;
+
+    // Calcular nuevas posiciones con límites
+    let newLeft = initialLeft + dx;
+    let newTop = initialTop + dy;
+
+    // Clampar para mantener dentro de la pantalla (con margen)
+    const minLeft = -100;
+    const maxLeft = window.innerWidth - 100;
+    const minTop = -100;
+    const maxTop = window.innerHeight - 100;
+
+    newLeft = clampValue(newLeft, minLeft, maxLeft);
+    newTop = clampValue(newTop, minTop, maxTop);
+
+    widget.style.left = `${newLeft}px`;
+    widget.style.top = `${newTop}px`;
+  };
+
+  const dragEnd = () => {
+    if (!isDragging) return;
+    isDragging = false;
+    widget.style.transition = 'all 0.3s ease'; // Restaurar transiciones
+  };
+
+  widget.addEventListener('mousedown', dragStart);
+  document.addEventListener('mousemove', drag);
+  document.addEventListener('mouseup', dragEnd);
+
+  widget.addEventListener('touchstart', dragStart, { passive: false });
+  document.addEventListener('touchmove', drag, { passive: false });
+  document.addEventListener('touchend', dragEnd);
+});
+
+/* ==========================================
+   FUNCIONES DE LOS BOTONES
+   ========================================== */
+
+// Estado de la música
+let isPlaying = false;
+const bgMusic = document.getElementById('bg-music');
+
+// Botón Play Canción
+const btnPlay = document.getElementById('btn-play-widget');
+if (btnPlay) {
+  btnPlay.addEventListener('click', () => {
+    if (bgMusic) {
+      if (isPlaying) {
+        bgMusic.pause();
+        btnPlay.textContent = '🎵 Play Fondo';
+        btnPlay.style.opacity = '0.7';
+      } else {
+        bgMusic.play();
+        btnPlay.textContent = '⏸ Pausar';
+        btnPlay.style.opacity = '1';
+      }
+      isPlaying = !isPlaying;
+    }
+  });
+}
+
+// Botón Guardar Foto del Ramo
+const btnDownload = document.getElementById('btn-download-widget');
+if (btnDownload) {
+  btnDownload.addEventListener('click', async () => {
+    try {
+      // Usar html2canvas si está disponible, sino usar captura nativa
+      if (typeof html2canvas !== 'undefined') {
+        const canvas = await html2canvas(document.querySelector('.ramo-scene'), {
+          backgroundColor: null,
+          scale: 2
+        });
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL();
+        link.download = 'mi-ramo-hermoso.png';
+        link.click();
+        btnDownload.textContent = '✅ Guardado';
+        setTimeout(() => { btnDownload.textContent = '📸 Guardar Foto'; }, 2000);
+      } else {
+        // Fallback: usar screenshot API si está disponible
+        if (navigator.screenshot) {
+          const canvas = await navigator.screenshot.captureScreen();
+          const link = document.createElement('a');
+          link.href = canvas.toDataURL();
+          link.download = 'mi-ramo-hermoso.png';
+          link.click();
+        } else {
+          alert('Intenta hacer una captura con tu teclado o usa la opción del sistema.');
+        }
+      }
+    } catch (error) {
+      console.error('Error al capturar pantalla:', error);
+    }
+  });
+}
+
+// Botón Mi Cielo Hermoso
+const btnCielo = document.getElementById('btn-cielo-widget');
+if (btnCielo) {
+  btnCielo.addEventListener('click', () => {
+    window.location.href = 'cielo.html';
+  });
+}
+
+// Botón Nuestro Libro
+const btnLibro = document.getElementById('btn-libro-widget');
+if (btnLibro) {
+  btnLibro.addEventListener('click', () => {
+    window.location.href = 'libro.html';
+  });
 }
